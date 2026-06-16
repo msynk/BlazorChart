@@ -1,0 +1,138 @@
+@page "/line"
+
+<PageTitle>Line charts</PageTitle>
+
+<div class="page-head">
+    <h1>Line charts</h1>
+    <p>Tension (bezier smoothing), area fill, stepped lines, dashed borders, point styles and gap handling.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Smooth + area fill</h3>
+        <p class="desc">tension 0.4, filled to origin</p>
+        <Chart Type="ChartType.Line" Data="@Filled()" Options="_legendBottom" />
+    </div>
+
+    <div class="card">
+        <h3>Straight lines</h3>
+        <p class="desc">tension 0, two series</p>
+        <Chart Type="ChartType.Line" Data="SampleData.MonthlySales()" Options="_legendBottom" />
+    </div>
+
+    <div class="card">
+        <h3>Stepped</h3>
+        <p class="desc">stepped: before</p>
+        <Chart Type="ChartType.Line" Data="@Stepped()" Options="_legendBottom" />
+    </div>
+
+    <div class="card">
+        <h3>Dashed + custom points</h3>
+        <p class="desc">borderDash, star markers, spanGaps</p>
+        <Chart Type="ChartType.Line" Data="@Dashed()" Options="_legendBottom" />
+    </div>
+
+    <div class="card">
+        <h3>Logarithmic Y axis</h3>
+        <p class="desc">type: logarithmic</p>
+        <Chart Type="ChartType.Line" Data="@Log()" Options="@_logOptions" />
+    </div>
+
+    <div class="card">
+        <h3>Per-segment styling</h3>
+        <p class="desc">up = green, down = red, projection dashed</p>
+        <Chart Type="ChartType.Line" Data="@Segmented()" Options="_legendBottom" />
+    </div>
+
+    <div class="card">
+        <h3>Monotone smoothing</h3>
+        <p class="desc">cubicInterpolationMode: monotone (no overshoot)</p>
+        <Chart Type="ChartType.Line" Data="@Monotone()" Options="_legendBottom" />
+    </div>
+</div>
+
+@code {
+    private readonly ChartOptions _legendBottom = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom } }
+    };
+
+    private readonly ChartOptions _logOptions = new()
+    {
+        Scales = { ["y"] = new ScaleOptions { Id = "y", Type = ScaleType.Logarithmic } }
+    };
+
+    private ChartData Filled() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new ChartDataset { Label = "Visitors", Data = SampleData.V(120, 190, 160, 250, 220, 300, 280),
+                BorderColor = "#36a2eb", Tension = 0.4, Fill = FillMode.Origin }
+        }
+    };
+
+    private ChartData Stepped() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new ChartDataset { Label = "Plan", Data = SampleData.V(10, 10, 25, 25, 40, 40, 55),
+                BorderColor = "#4bc0c0", Stepped = SteppedLine.Before }
+        }
+    };
+
+    private ChartData Dashed() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new ChartDataset { Label = "Forecast", Data = SampleData.V(30, 42, null, 55, 48, 67, 70),
+                BorderColor = "#9966ff", BorderDash = new() { 6, 4 }, PointStyle = PointStyle.Star,
+                PointRadius = 6, SpanGaps = true }
+        }
+    };
+
+    private ChartData Log() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new ChartDataset { Label = "Growth", Data = SampleData.V(1, 10, 100, 1000, 5000, 20000, 80000),
+                BorderColor = "#ff6384", Tension = 0.2 }
+        }
+    };
+
+    private ChartData Segmented() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new ChartDataset
+            {
+                Label = "Flow",
+                Data = SampleData.V(40, 55, 48, 70, 62, 80, 72),
+                BorderColor = "#36a2eb",
+                BorderWidth = 3,
+                Segment = new LineSegmentStyle
+                {
+                    BorderColor = ctx => ctx.EndValue < ctx.StartValue ? "#ff6384" : "#2ecc71",
+                    BorderDash = ctx => ctx.StartIndex >= 4 ? new double[] { 6, 4 } : null
+                }
+            }
+        }
+    };
+
+    private ChartData Monotone() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new ChartDataset { Label = "Cardinal (tension)", Data = SampleData.V(10, 12, 60, 62, 30, 32, 70),
+                BorderColor = "#c9cbcf", Tension = 0.5, PointRadius = 3, PointBackgroundColor = "#c9cbcf" },
+            new ChartDataset { Label = "Monotone", Data = SampleData.V(10, 12, 60, 62, 30, 32, 70),
+                BorderColor = "#36a2eb", CubicInterpolationMode = CubicInterpolationMode.Monotone,
+                PointRadius = 3, PointBackgroundColor = "#36a2eb" }
+        }
+    };
+}

@@ -1,0 +1,47 @@
+﻿@inherits LayoutComponentBase
+
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <span class="brand-mark">◔</span>
+            <div>
+                <div class="brand-title">BlazorChart</div>
+                <div class="brand-sub">native SVG charts</div>
+            </div>
+        </div>
+        <nav>
+            <NavLink class="nav-item" href="" Match="NavLinkMatch.All">Overview</NavLink>
+            <div class="nav-group">Cartesian</div>
+            <NavLink class="nav-item" href="line">Line</NavLink>
+            <NavLink class="nav-item" href="area">Area &amp; Gradients</NavLink>
+            <NavLink class="nav-item" href="bar">Bar</NavLink>
+            <NavLink class="nav-item" href="scatter">Scatter &amp; Bubble</NavLink>
+            <NavLink class="nav-item" href="mixed">Mixed</NavLink>
+            <NavLink class="nav-item" href="multi-axis">Multi-axis &amp; Combo</NavLink>
+            <div class="nav-group">Radial &amp; Circular</div>
+            <NavLink class="nav-item" href="pie">Pie &amp; Doughnut</NavLink>
+            <NavLink class="nav-item" href="radar">Radar</NavLink>
+            <NavLink class="nav-item" href="polar">Polar Area</NavLink>
+            <div class="nav-group">More</div>
+            <NavLink class="nav-item" href="features">Customization</NavLink>
+            <NavLink class="nav-item" href="scales">Scales</NavLink>
+            <NavLink class="nav-item" href="legend">Legend</NavLink>
+            <NavLink class="nav-item" href="scriptable">Scriptable options</NavLink>
+            <NavLink class="nav-item" href="tooltips">Tooltips</NavLink>
+            <NavLink class="nav-item" href="animations">Animations</NavLink>
+            <NavLink class="nav-item" href="time">Time axis</NavLink>
+            <NavLink class="nav-item" href="annotations">Annotations &amp; Plugins</NavLink>
+            <NavLink class="nav-item" href="zoom">Zoom, Pan &amp; Decimation</NavLink>
+            <NavLink class="nav-item" href="playground">Playground</NavLink>
+        </nav>
+    </aside>
+    <main class="content">
+        @Body
+    </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

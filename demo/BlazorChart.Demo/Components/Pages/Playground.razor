@@ -1,0 +1,79 @@
+@page "/playground"
+
+<PageTitle>Playground</PageTitle>
+
+<div class="page-head">
+    <h1>Playground</h1>
+    <p>Switch chart type and options live against the same dataset. The chart recomputes instantly &mdash; all in C#.</p>
+</div>
+
+<div class="controls">
+    <label>
+        Type
+        <select @bind="_type">
+            @foreach (var t in Enum.GetValues<ChartType>())
+            {
+                <option value="@t">@t</option>
+            }
+        </select>
+    </label>
+    <label>
+        Legend
+        <select @bind="_legend">
+            <option value="@Position.Top">Top</option>
+            <option value="@Position.Bottom">Bottom</option>
+            <option value="@Position.Left">Left</option>
+            <option value="@Position.Right">Right</option>
+        </select>
+    </label>
+    <label><input type="checkbox" @bind="_showLegend" /> Show legend</label>
+    <label><input type="checkbox" @bind="_fill" /> Fill area</label>
+    <label><input type="checkbox" @bind="_stacked" /> Stacked</label>
+    <label>
+        Tension
+        <input type="number" step="0.1" min="0" max="1" @bind="_tension" style="width:70px" />
+    </label>
+</div>
+
+<div class="card">
+    <Chart Config="@BuildConfig()" />
+</div>
+
+@code {
+    private ChartType _type = ChartType.Bar;
+    private Position _legend = Position.Top;
+    private bool _showLegend = true;
+    private bool _fill = false;
+    private bool _stacked = false;
+    private double _tension = 0.3;
+
+    private ChartConfig BuildConfig()
+    {
+        var data = new ChartData
+        {
+            Labels = SampleData.Months.ToList(),
+            Datasets =
+            {
+                new ChartDataset { Label = "Alpha", Data = SampleData.V(65, 59, 80, 81, 56, 55, 72),
+                    Tension = _tension, Fill = _fill ? FillMode.Origin : FillMode.None },
+                new ChartDataset { Label = "Beta", Data = SampleData.V(28, 48, 40, 60, 86, 92, 78),
+                    Tension = _tension, Fill = _fill ? FillMode.Origin : FillMode.None }
+            }
+        };
+
+        var options = new ChartOptions
+        {
+            Plugins = new PluginOptions
+            {
+                Legend = new LegendOptions { Display = _showLegend, Position = _legend }
+            },
+            Scales =
+            {
+                ["x"] = new ScaleOptions { Id = "x", Type = ScaleType.Category, Stacked = _stacked },
+                ["y"] = new ScaleOptions { Id = "y", Type = ScaleType.Linear, Stacked = _stacked, BeginAtZero = true }
+            }
+        };
+
+        return new ChartConfig(_type, data, options);
+    }
+}

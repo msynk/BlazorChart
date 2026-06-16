@@ -1,0 +1,90 @@
+@page "/pie"
+
+<PageTitle>Pie &amp; Doughnut</PageTitle>
+
+<div class="page-head">
+    <h1>Pie &amp; Doughnut</h1>
+    <p>Proportional slices with click-to-toggle legend, adjustable cutout, rotation and partial circumference. Hover a slice to see its share.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Pie</h3>
+        <p class="desc">click a legend label to hide a slice</p>
+        <Chart Type="ChartType.Pie" Data="SampleData.Traffic()" Options="_right" />
+    </div>
+
+    <div class="card">
+        <h3>Doughnut</h3>
+        <p class="desc">cutout 60%</p>
+        <Chart Type="ChartType.Doughnut" Data="SampleData.Traffic()" Options="@_doughnut" />
+    </div>
+
+    <div class="card">
+        <h3>Half doughnut (gauge)</h3>
+        <p class="desc">circumference 180°, rotation -90°</p>
+        <Chart Type="ChartType.Doughnut" Data="@Gauge()" Options="@_gauge" />
+    </div>
+
+    <div class="card">
+        <h3>Multi-ring</h3>
+        <p class="desc">two datasets as concentric rings</p>
+        <Chart Type="ChartType.Doughnut" Data="@MultiRing()" Options="_right" />
+    </div>
+
+    <div class="card">
+        <h3>Center text (KPI)</h3>
+        <p class="desc">CenterTextPlugin draws a total in the cutout</p>
+        <Chart Type="ChartType.Doughnut" Data="SampleData.Traffic()" Options="@_centerText" />
+    </div>
+</div>
+
+@code {
+    private readonly ChartOptions _right = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Right } }
+    };
+
+    private readonly ChartOptions _centerText = new()
+    {
+        CutoutPercentage = 68,
+        Plugins = new PluginOptions
+        {
+            Legend = new LegendOptions { Position = Position.Right },
+            Custom = { new CenterTextPlugin("1,340", "sessions") }
+        }
+    };
+
+    private readonly ChartOptions _doughnut = new()
+    {
+        CutoutPercentage = 60,
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Right } }
+    };
+
+    private readonly ChartOptions _gauge = new()
+    {
+        CutoutPercentage = 65,
+        CircumferenceDegrees = 180,
+        RotationDegrees = -90,
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom } }
+    };
+
+    private ChartData Gauge() => new()
+    {
+        Labels = { "Used", "Free" },
+        Datasets =
+        {
+            new ChartDataset { Data = SampleData.V(68, 32), BackgroundColors = new() { "#ff6384", "#e6e9ef" } }
+        }
+    };
+
+    private ChartData MultiRing() => new()
+    {
+        Labels = { "Mobile", "Desktop", "Tablet" },
+        Datasets =
+        {
+            new ChartDataset { Label = "2025", Data = SampleData.V(55, 35, 10) },
+            new ChartDataset { Label = "2026", Data = SampleData.V(62, 28, 10) }
+        }
+    };
+}

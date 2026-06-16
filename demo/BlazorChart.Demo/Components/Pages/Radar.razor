@@ -1,0 +1,75 @@
+@page "/radar"
+
+<PageTitle>Radar charts</PageTitle>
+
+<div class="page-head">
+    <h1>Radar charts</h1>
+    <p>Compare multiple series across shared categories on a radial axis with angle lines and a filled web.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Two players</h3>
+        <p class="desc">filled areas</p>
+        <Chart Type="ChartType.Radar" Data="SampleData.Skills()" Options="_bottom" />
+    </div>
+
+    <div class="card">
+        <h3>Outline only</h3>
+        <p class="desc">no fill, thicker borders</p>
+        <Chart Type="ChartType.Radar" Data="@Outline()" Options="_bottom" />
+    </div>
+
+    <div class="card">
+        <h3>Circular grid</h3>
+        <p class="desc">grid.circular + styled point labels &amp; backdrop</p>
+        <Chart Type="ChartType.Radar" Data="SampleData.Skills()" Options="@_circular" />
+    </div>
+
+    <div class="card">
+        <h3>Skipped points</h3>
+        <p class="desc">null values are skipped, not zeroed</p>
+        <Chart Type="ChartType.Radar" Data="@Skip()" Options="_bottom" />
+    </div>
+</div>
+
+@code {
+    private readonly ChartOptions _bottom = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom } }
+    };
+
+    private readonly ChartOptions _circular = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom } },
+        Scales =
+        {
+            ["r"] = new ScaleOptions
+            {
+                Id = "r", Type = ScaleType.RadialLinear, BeginAtZero = true,
+                Grid = new GridOptions { Circular = true },
+                AngleLineColor = "rgba(0,0,0,0.15)",
+                PointLabels = new PointLabelOptions { Color = "#36a2eb", Font = new ChartFont { Size = 12, Weight = "bold" } }
+            }
+        }
+    };
+
+    private ChartData Outline() => new()
+    {
+        Labels = { "HTML", "CSS", "JS", "C#", "SQL", "DevOps" },
+        Datasets =
+        {
+            new ChartDataset { Label = "Team A", Data = SampleData.V(90, 75, 80, 95, 60, 70), BorderColor = "#36a2eb", Fill = FillMode.None, BorderWidth = 2 },
+            new ChartDataset { Label = "Team B", Data = SampleData.V(70, 85, 65, 60, 90, 80), BorderColor = "#ff9f40", Fill = FillMode.None, BorderWidth = 2 }
+        }
+    };
+
+    private ChartData Skip() => new()
+    {
+        Labels = { "Speed", "Power", "Range", "Defense", "Agility", "Stamina" },
+        Datasets =
+        {
+            new ChartDataset { Label = "Scouted", Data = SampleData.V(80, 65, null, 60, 85, null), BorderColor = "#9966ff", Fill = FillMode.Origin }
+        }
+    };
+}

@@ -1,0 +1,95 @@
+@page "/zoom"
+
+<PageTitle>Zoom, Pan &amp; Decimation</PageTitle>
+
+<div class="page-head">
+    <h1>Zoom, Pan &amp; Decimation</h1>
+    <p>
+        Scroll to zoom, drag to pan, double-click to reset. Large series are downsampled with the
+        LTTB algorithm so thousands of points stay smooth. Pointer math uses a tiny JS helper; all
+        drawing remains pure SVG.
+    </p>
+</div>
+
+<div class="card" style="margin-bottom:22px">
+    <h3>@(_count.ToString("N0")) points &mdash; decimated to @_samples</h3>
+    <p class="desc">wheel = zoom X · drag = pan · double-click = reset</p>
+    <Chart Type="ChartType.Line" Data="@_data" Options="@_options" />
+</div>
+
+<div class="card">
+    <h3>Zoom both axes</h3>
+    <p class="desc">Mode = XY on a scatter plot</p>
+    <Chart Type="ChartType.Scatter" Data="@Scatter()" Options="@_xy" />
+</div>
+
+<div class="card" style="margin-top:22px">
+    <h3>Drag-to-zoom box</h3>
+    <p class="desc">drag a rectangle to zoom into it · double-click to reset</p>
+    <Chart Type="ChartType.Scatter" Data="@Scatter()" Options="@_drag" />
+</div>
+
+<div class="card" style="margin-top:22px">
+    <h3>Category-axis zoom</h3>
+    <p class="desc">scroll to zoom a 40-category bar chart · drag to pan</p>
+    <Chart Type="ChartType.Bar" Data="@ManyBars()" Options="@_catZoom" />
+</div>
+
+@code {
+    private const int _count = 5000;
+    private const int _samples = 250;
+    private ChartData _data = default!;
+
+    private readonly ChartOptions _options = new()
+    {
+        Plugins = new PluginOptions
+        {
+            Legend = new LegendOptions { Display = false },
+            Decimation = new DecimationOptions { Enabled = true, Samples = _samples, Threshold = 400 },
+            Tooltip = new TooltipOptions { Enabled = false }
+        },
+        Zoom = new ZoomOptions { Enabled = true, Mode = ZoomMode.X },
+        Scales = { ["x"] = new ScaleOptions { Id = "x", Type = ScaleType.Time } }
+    };
+
+    private readonly ChartOptions _xy = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Display = false } },
+        Zoom = new ZoomOptions { Enabled = true, Mode = ZoomMode.XY }
+    };
+
+    private readonly ChartOptions _drag = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Display = false } },
+        Zoom = new ZoomOptions { Enabled = true, Mode = ZoomMode.XY, DragZoom = true, Wheel = false }
+    };
+
+    private readonly ChartOptions _catZoom = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Display = false } },
+        Zoom = new ZoomOptions { Enabled = true, Mode = ZoomMode.X }
+    };
+
+    private ChartData ManyBars()
+    {
+        var rnd = new Random(11);
+        var labels = Enumerable.Range(1, 40).Select(i => $"D{i}").ToList();
+        var data = Enumerable.Range(0, 40).Select(_ => (double?)Math.Round(rnd.NextDouble() * 80 + 20, 0)).ToList();
+        return new ChartData
+        {
+            Labels = labels,
+            Datasets = { new ChartDataset { Label = "Daily", Data = data, BackgroundColor = "#4bc0c0" } }
+        };
+    }
+
+    protected override void OnInitialized() => _data = SampleData.LargeSeries(_count);
+
+    private ChartData Scatter()
+    {
+        var rnd = new Random(3);
+        var pts = new List<DataPoint>();
+        for (int i = 0; i < 400; i++)
+            pts.Add(new DataPoint(rnd.NextDouble() * 100 - 50, rnd.NextDouble() * 100 - 50));
+        return new ChartData { Datasets = { new ChartDataset { Label = "Cloud", BackgroundColor = "rgba(54,162,235,0.6)", Points = pts } } };
+    }
+}

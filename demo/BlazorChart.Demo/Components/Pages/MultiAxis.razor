@@ -1,0 +1,112 @@
+@page "/multi-axis"
+
+<PageTitle>Multi-axis &amp; combo</PageTitle>
+
+<div class="page-head">
+    <h1>Multi-axis &amp; combo</h1>
+    <p>Datasets bound to independent value axes, and a bar+line combo &mdash; each axis scaled, positioned and titled on its own.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Rainfall + temperature</h3>
+        <p class="desc">bars on left axis, line on right axis</p>
+        <Chart Data="SampleData.TempAndRainfall()" Options="@_combo" />
+    </div>
+
+    <div class="card">
+        <h3>Dual line axes</h3>
+        <p class="desc">two metrics with very different ranges</p>
+        <Chart Type="ChartType.Line" Data="@DualLine()" Options="@_dual" />
+    </div>
+
+    <div class="card">
+        <h3>Two x-axes</h3>
+        <p class="desc">a second x-axis (top) with its own scale</p>
+        <Chart Type="ChartType.Scatter" Data="@DualX()" Options="@_dualX" />
+    </div>
+</div>
+
+@code {
+    private readonly ChartOptions _combo = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom } },
+        Scales =
+        {
+            ["y"] = new ScaleOptions
+            {
+                Id = "y", Type = ScaleType.Linear, Position = Position.Left, BeginAtZero = true,
+                Title = new ScaleTitleOptions { Display = true, Text = "Rainfall (mm)" }
+            },
+            ["y2"] = new ScaleOptions
+            {
+                Id = "y2", Type = ScaleType.Linear, Position = Position.Right, BeginAtZero = true,
+                Title = new ScaleTitleOptions { Display = true, Text = "Temp (°C)" },
+                Grid = new GridOptions { DrawOnChartArea = false },
+                Ticks = new TickOptions { Suffix = "°" }
+            }
+        }
+    };
+
+    private readonly ChartOptions _dual = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom } },
+        Scales =
+        {
+            ["y"] = new ScaleOptions
+            {
+                Id = "y", Type = ScaleType.Linear, Position = Position.Left,
+                Title = new ScaleTitleOptions { Display = true, Text = "Users" }
+            },
+            ["y2"] = new ScaleOptions
+            {
+                Id = "y2", Type = ScaleType.Linear, Position = Position.Right,
+                Title = new ScaleTitleOptions { Display = true, Text = "Latency (ms)" },
+                Grid = new GridOptions { DrawOnChartArea = false }
+            }
+        }
+    };
+
+    private ChartData DualLine() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new ChartDataset { Label = "Active users", Data = SampleData.V(1200, 1900, 1700, 2400, 2200, 3000, 2800),
+                BorderColor = "#36a2eb", BackgroundColor = "#36a2eb", Tension = 0.4, YAxisID = "y" },
+            new ChartDataset { Label = "Latency", Data = SampleData.V(120, 95, 110, 80, 90, 70, 65),
+                BorderColor = "#ff9f40", BackgroundColor = "#ff9f40", Tension = 0.4, YAxisID = "y2", BorderDash = new() { 5, 4 } }
+        }
+    };
+
+    private readonly ChartOptions _dualX = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom, Labels = new LegendLabelOptions { UsePointStyle = true } } },
+        Scales =
+        {
+            ["x"] = new ScaleOptions { Id = "x", Type = ScaleType.Linear, Position = Position.Bottom,
+                Title = new ScaleTitleOptions { Display = true, Text = "Wavelength (nm)" } },
+            ["x2"] = new ScaleOptions { Id = "x2", Type = ScaleType.Linear, Position = Position.Top,
+                Title = new ScaleTitleOptions { Display = true, Text = "Frequency (THz)" },
+                Grid = new GridOptions { DrawOnChartArea = false } },
+            ["y"] = new ScaleOptions { Id = "y", Type = ScaleType.Linear, Grace = 0.1 }
+        }
+    };
+
+    private ChartData DualX() => new()
+    {
+        Datasets =
+        {
+            new ChartDataset
+            {
+                Label = "Visible", BackgroundColor = "#36a2eb", XAxisID = "x", PointRadius = 6,
+                Points = new() { new(450, 20), new(520, 45), new(580, 60), new(640, 38), new(700, 25) }
+            },
+            new ChartDataset
+            {
+                Label = "Frequency band", BackgroundColor = "#ff6384", XAxisID = "x2", PointStyle = PointStyle.Triangle, PointRadius = 6,
+                Points = new() { new(430, 30), new(500, 55), new(600, 40), new(660, 50) }
+            }
+        }
+    };
+}

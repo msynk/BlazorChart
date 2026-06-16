@@ -1,0 +1,195 @@
+@page "/bar"
+
+<PageTitle>Bar charts</PageTitle>
+
+<div class="page-head">
+    <h1>Bar charts</h1>
+    <p>Grouped, stacked, horizontal, per-bar colors and rounded corners.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Grouped</h3>
+        <p class="desc">three datasets side by side</p>
+        <Chart Type="ChartType.Bar" Data="SampleData.Revenue()" Options="_bottom" />
+    </div>
+
+    <div class="card">
+        <h3>Stacked</h3>
+        <p class="desc">scales.y.stacked = true</p>
+        <Chart Type="ChartType.Bar" Data="SampleData.Revenue()" Options="@_stacked" />
+    </div>
+
+    <div class="card">
+        <h3>Horizontal</h3>
+        <p class="desc">indexAxis = y</p>
+        <Chart Type="ChartType.Bar" Data="@PerColor()" Options="@_horizontal" />
+    </div>
+
+    <div class="card">
+        <h3>Rounded + per-bar colors</h3>
+        <p class="desc">borderRadius, palette per index</p>
+        <Chart Type="ChartType.Bar" Data="@PerColor()" Options="@_rounded" />
+    </div>
+
+    <div class="card">
+        <h3>Floating bars</h3>
+        <p class="desc">each bar spans a [low, high] range</p>
+        <Chart Type="ChartType.Bar" Data="@Floating()" Options="_noLegend" />
+    </div>
+
+    <div class="card">
+        <h3>100% stacked</h3>
+        <p class="desc">scales.y.stacked100 normalizes each category</p>
+        <Chart Type="ChartType.Bar" Data="SampleData.Revenue()" Options="@_stacked100" />
+    </div>
+
+    <div class="card">
+        <h3>Pattern fills</h3>
+        <p class="desc">hatch &amp; dot patterns (print-friendly)</p>
+        <Chart Type="ChartType.Bar" Data="@Patterned()" Options="_bottom" />
+    </div>
+
+    <div class="card">
+        <h3>Top-rounded corners</h3>
+        <p class="desc">per-corner borderRadius</p>
+        <Chart Type="ChartType.Bar" Data="@TopRounded()" Options="_noLegend" />
+    </div>
+
+    <div class="card">
+        <h3>Auto-rotated labels</h3>
+        <p class="desc">long category labels tilt to fit</p>
+        <Chart Type="ChartType.Bar" Data="SampleData.Countries()" Options="_noLegend" />
+    </div>
+
+    <div class="card">
+        <h3>Stacked groups</h3>
+        <p class="desc">two independent stacks side by side (Stack id)</p>
+        <Chart Type="ChartType.Bar" Data="@StackedGroups()" Options="@_stackedGroups" />
+    </div>
+</div>
+
+@code {
+    private readonly ChartOptions _bottom = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom } }
+    };
+
+    private readonly ChartOptions _stacked = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom } },
+        Scales =
+        {
+            ["x"] = new ScaleOptions { Id = "x", Type = ScaleType.Category, Stacked = true },
+            ["y"] = new ScaleOptions { Id = "y", Type = ScaleType.Linear, Stacked = true, BeginAtZero = true }
+        }
+    };
+
+    private readonly ChartOptions _horizontal = new()
+    {
+        IndexAxis = IndexAxis.Y,
+        Plugins = new PluginOptions { Legend = new LegendOptions { Display = false } }
+    };
+
+    private readonly ChartOptions _rounded = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Display = false } }
+    };
+
+    private readonly ChartOptions _noLegend = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Display = false } }
+    };
+
+    private readonly ChartOptions _stacked100 = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom } },
+        Scales =
+        {
+            ["x"] = new ScaleOptions { Id = "x", Type = ScaleType.Category, Stacked = true },
+            ["y"] = new ScaleOptions { Id = "y", Type = ScaleType.Linear, Stacked = true, Stacked100 = true, Ticks = new TickOptions { Suffix = "%" } }
+        }
+    };
+
+    private ChartData Floating() => new()
+    {
+        Labels = { "Mon", "Tue", "Wed", "Thu", "Fri" },
+        Datasets =
+        {
+            new ChartDataset
+            {
+                Label = "Temp range (°C)",
+                BackgroundColor = "#ff9f40",
+                BorderRadius = 4,
+                RangeData = new()
+                {
+                    (8, 16), (10, 19), (7, 14), (11, 21), (9, 18)
+                }
+            }
+        }
+    };
+
+    private ChartData Patterned() => new()
+    {
+        Labels = { "Alpha", "Beta", "Gamma", "Delta" },
+        Datasets =
+        {
+            new ChartDataset { Label = "A", Data = SampleData.V(40, 55, 35, 60), BorderColor = "#36a2eb", BorderWidth = 1,
+                BackgroundPattern = new FillPattern(PatternStyle.DiagonalUp, "#36a2eb", "rgba(54,162,235,0.12)") },
+            new ChartDataset { Label = "B", Data = SampleData.V(28, 42, 50, 33), BorderColor = "#ff6384", BorderWidth = 1,
+                BackgroundPattern = new FillPattern(PatternStyle.Dots, "#ff6384", "rgba(255,99,132,0.10)") }
+        }
+    };
+
+    private ChartData PerColor() => new()
+    {
+        Labels = { "Red", "Blue", "Teal", "Orange", "Purple" },
+        Datasets =
+        {
+            new ChartDataset
+            {
+                Label = "Votes",
+                Data = SampleData.V(12, 19, 7, 15, 9),
+                BackgroundColors = new() { "#ff6384", "#36a2eb", "#4bc0c0", "#ff9f40", "#9966ff" },
+                BorderRadius = 6
+            }
+        }
+    };
+
+    private ChartData TopRounded() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new ChartDataset
+            {
+                Label = "Throughput",
+                Data = SampleData.V(40, 65, 50, 80, 60, 72, 55),
+                BackgroundColor = "#36a2eb",
+                BorderRadiusCorners = BorderRadiusCorners.Top(10)
+            }
+        }
+    };
+
+    private readonly ChartOptions _stackedGroups = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Bottom } },
+        Scales =
+        {
+            ["x"] = new ScaleOptions { Id = "x", Type = ScaleType.Category, Stacked = true },
+            ["y"] = new ScaleOptions { Id = "y", Type = ScaleType.Linear, Stacked = true, BeginAtZero = true }
+        }
+    };
+
+    private ChartData StackedGroups() => new()
+    {
+        Labels = { "Q1", "Q2", "Q3", "Q4" },
+        Datasets =
+        {
+            new ChartDataset { Label = "2025 · New", Stack = "2025", Data = SampleData.V(20, 28, 24, 32), BackgroundColor = "#36a2eb" },
+            new ChartDataset { Label = "2025 · Renew", Stack = "2025", Data = SampleData.V(12, 16, 14, 18), BackgroundColor = "#9cd0f5" },
+            new ChartDataset { Label = "2026 · New", Stack = "2026", Data = SampleData.V(26, 30, 29, 38), BackgroundColor = "#ff6384" },
+            new ChartDataset { Label = "2026 · Renew", Stack = "2026", Data = SampleData.V(15, 18, 17, 22), BackgroundColor = "#ffb1c1" }
+        }
+    };
+}

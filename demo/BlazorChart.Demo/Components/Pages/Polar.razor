@@ -1,0 +1,51 @@
+@page "/polar"
+
+<PageTitle>Polar area</PageTitle>
+
+<div class="page-head">
+    <h1>Polar area</h1>
+    <p>Equal-angle slices whose radius is driven by value, drawn over a radial grid.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Polar area</h3>
+        <p class="desc">click legend to toggle slices</p>
+        <Chart Type="ChartType.PolarArea" Data="@Data()" Options="_right" />
+    </div>
+
+    <div class="card">
+        <h3>Centered point labels</h3>
+        <p class="desc">category labels around the perimeter</p>
+        <Chart Type="ChartType.PolarArea" Data="@Data()" Options="@_labels" />
+    </div>
+</div>
+
+@code {
+    private readonly ChartOptions _right = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Position = Position.Right } }
+    };
+
+    private readonly ChartOptions _labels = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Display = false } },
+        Scales =
+        {
+            ["r"] = new ScaleOptions
+            {
+                Id = "r", Type = ScaleType.RadialLinear,
+                PointLabels = new PointLabelOptions { Color = "#36507a", Font = new ChartFont { Size = 12, Weight = "bold" } }
+            }
+        }
+    };
+
+    private ChartData Data() => new()
+    {
+        Labels = { "Red", "Green", "Yellow", "Grey", "Blue" },
+        Datasets =
+        {
+            new ChartDataset { Label = "Votes", Data = SampleData.V(11, 16, 7, 14, 20) }
+        }
+    };
+}

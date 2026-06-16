@@ -1,0 +1,157 @@
+@page "/features"
+
+<PageTitle>Customization</PageTitle>
+
+<div class="page-head">
+    <h1>Customization</h1>
+    <p>Titles &amp; subtitles, axis titles, tick formatting callbacks, custom tooltip text, data labels, grid styling and click events.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Title, subtitle &amp; axis titles</h3>
+        <p class="desc">currency tick formatting via callback</p>
+        <Chart Type="ChartType.Line" Data="@Revenue()" Options="@_titled" />
+    </div>
+
+    <div class="card">
+        <h3>Data labels</h3>
+        <p class="desc">values drawn above each bar</p>
+        <Chart Type="ChartType.Bar" Data="@Simple()" Options="@_dataLabels" />
+    </div>
+
+    <div class="card">
+        <h3>Custom grid &amp; ticks</h3>
+        <p class="desc">dashed grid, stepSize, suffix</p>
+        <Chart Type="ChartType.Line" Data="@Simple()" Options="@_grid" />
+    </div>
+
+    <div class="card">
+        <h3>Click events</h3>
+        <p class="desc">click any bar</p>
+        <Chart Type="ChartType.Bar" Data="@Simple()" OnElementClick="OnClick" />
+        <div class="click-log">@_log</div>
+    </div>
+
+    <div class="card">
+        <h3>Custom tooltip template</h3>
+        <p class="desc">index mode + your own Razor markup</p>
+        <Chart Type="ChartType.Line" Data="@TwoSeries()" Options="@_indexTooltip">
+            <TooltipTemplate Context="ctx">
+                <div style="font-weight:600;margin-bottom:4px">@ctx.Title</div>
+                @foreach (var p in ctx.Points)
+                {
+                    <div style="display:flex;align-items:center;gap:6px">
+                        <span style="width:10px;height:10px;border-radius:50%;background:@p.Color;display:inline-block"></span>
+                        <span>@p.Label</span>
+                        <strong style="margin-left:auto">@p.Value.ToString("C0")</strong>
+                    </div>
+                }
+            </TooltipTemplate>
+        </Chart>
+    </div>
+
+    <div class="card">
+        <h3>Multi-line &amp; bottom title</h3>
+        <p class="desc">title with a line break, positioned below</p>
+        <Chart Type="ChartType.Bar" Data="@Simple()" Options="@_bottomTitle" />
+    </div>
+</div>
+
+@code {
+    private string _log = "No element clicked yet.";
+
+    private void OnClick((int DatasetIndex, int DataIndex) e)
+        => _log = $"Clicked dataset {e.DatasetIndex}, index {e.DataIndex}.";
+
+    private readonly ChartOptions _titled = new()
+    {
+        Plugins = new PluginOptions
+        {
+            Title = new TitleOptions { Display = true, Text = "Quarterly Revenue" },
+            Subtitle = new TitleOptions { Display = true, Text = "in thousands of USD" },
+            Legend = new LegendOptions { Position = Position.Bottom },
+            Tooltip = new TooltipOptions { LabelFormatter = (label, v) => $"{label}: ${v:N0}k" }
+        },
+        Scales =
+        {
+            ["y"] = new ScaleOptions
+            {
+                Id = "y", Type = ScaleType.Linear, BeginAtZero = true,
+                Title = new ScaleTitleOptions { Display = true, Text = "Revenue" },
+                Ticks = new TickOptions { Prefix = "$", Suffix = "k" }
+            }
+        }
+    };
+
+    private readonly ChartOptions _dataLabels = new()
+    {
+        Plugins = new PluginOptions
+        {
+            Legend = new LegendOptions { Display = false },
+            DataLabels = new DataLabelOptions { Display = true, Color = "#333" }
+        }
+    };
+
+    private readonly ChartOptions _grid = new()
+    {
+        Plugins = new PluginOptions { Legend = new LegendOptions { Display = false } },
+        Scales =
+        {
+            ["y"] = new ScaleOptions
+            {
+                Id = "y", Type = ScaleType.Linear, BeginAtZero = true,
+                Ticks = new TickOptions { StepSize = 20, Suffix = "%" },
+                Grid = new GridOptions { BorderDash = new() { 4, 4 }, Color = "rgba(54,162,235,0.18)" }
+            }
+        }
+    };
+
+    private ChartData Revenue() => new()
+    {
+        Labels = { "Q1", "Q2", "Q3", "Q4" },
+        Datasets =
+        {
+            new ChartDataset { Label = "2026", Data = SampleData.V(120, 150, 170, 210), BorderColor = "#36a2eb", Tension = 0.4, Fill = FillMode.Origin }
+        }
+    };
+
+    private ChartData Simple() => new()
+    {
+        Labels = { "Mon", "Tue", "Wed", "Thu", "Fri" },
+        Datasets =
+        {
+            new ChartDataset { Label = "Load", Data = SampleData.V(40, 65, 50, 80, 60),
+                BackgroundColors = new() { "#36a2eb", "#ff6384", "#4bc0c0", "#ff9f40", "#9966ff" },
+                BorderColor = "#36a2eb", Tension = 0.4 }
+        }
+    };
+
+    private readonly ChartOptions _bottomTitle = new()
+    {
+        Plugins = new PluginOptions
+        {
+            Legend = new LegendOptions { Display = false },
+            Title = new TitleOptions { Display = true, Text = "Weekly Load\n(arbitrary units)", Position = Position.Bottom }
+        }
+    };
+
+    private readonly ChartOptions _indexTooltip = new()
+    {
+        Plugins = new PluginOptions
+        {
+            Legend = new LegendOptions { Position = Position.Bottom },
+            Tooltip = new TooltipOptions { Mode = InteractionMode.Index, Position = TooltipPositioner.Average }
+        }
+    };
+
+    private ChartData TwoSeries() => new()
+    {
+        Labels = { "Q1", "Q2", "Q3", "Q4" },
+        Datasets =
+        {
+            new ChartDataset { Label = "Revenue", Data = SampleData.V(1200, 1500, 1700, 2100), BorderColor = "#36a2eb", Tension = 0.4 },
+            new ChartDataset { Label = "Costs", Data = SampleData.V(800, 950, 1100, 1300), BorderColor = "#ff6384", Tension = 0.4 }
+        }
+    };
+}

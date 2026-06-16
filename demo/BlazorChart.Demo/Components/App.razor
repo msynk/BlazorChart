@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <ResourcePreloader />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["BlazorChart.Demo.styles.css"]" />
+    <ImportMap />
+    <HeadOutlet />
+</head>
+
+<body>
+    <Routes />
+    <ReconnectModal />
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script>
+        // Blazor enhanced navigation morphs the DOM rather than reloading the page, so CSS entry
+        // animations on charts don't re-trigger. Restart them after each enhanced navigation.
+        (function () {
+            function restart() {
+                document.querySelectorAll('.bc-animate, .bc-draw, .bc-fade').forEach(function (el) {
+                    el.style.animation = 'none';
+                    void el.getBoundingClientRect(); // force reflow
+                    el.style.animation = '';
+                });
+            }
+            function hook() {
+                if (window.Blazor && Blazor.addEventListener) {
+                    Blazor.addEventListener('enhancedload', function () {
+                        // Defer so the morphed DOM is fully in place.
+                        requestAnimationFrame(restart);
+                    });
+                } else {
+                    setTimeout(hook, 50);
+                }
+            }
+            hook();
+        })();
+    </script>
+</body>
+
+</html>

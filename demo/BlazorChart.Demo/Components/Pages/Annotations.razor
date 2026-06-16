@@ -1,0 +1,77 @@
+@page "/annotations"
+@using BlazorChart.Rendering.Plugins
+
+<PageTitle>Annotations &amp; Plugins</PageTitle>
+
+<div class="page-head">
+    <h1>Annotations &amp; Plugins</h1>
+    <p>
+        The renderer exposes an <code>IChartPlugin</code> pipeline. The built-in
+        <code>AnnotationPlugin</code> draws threshold lines, target boxes, points and labels in data
+        coordinates &mdash; the same model as chartjs-plugin-annotation.
+    </p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Threshold lines</h3>
+        <p class="desc">horizontal target + warning band</p>
+        <Chart Type="ChartType.Line" Data="@Series()" Options="@_lines" />
+    </div>
+
+    <div class="card">
+        <h3>Box + vertical marker</h3>
+        <p class="desc">highlight a region and an event</p>
+        <Chart Type="ChartType.Bar" Data="@Bars()" Options="@_box" />
+    </div>
+</div>
+
+@code {
+    private ChartOptions _lines = default!;
+    private ChartOptions _box = default!;
+
+    protected override void OnInitialized()
+    {
+        _lines = new ChartOptions
+        {
+            Plugins = new PluginOptions
+            {
+                Legend = new LegendOptions { Display = false },
+                Custom =
+                {
+                    new AnnotationPlugin(
+                        new Annotation { Orientation = LineOrientation.Horizontal, Value = 80, Color = "#2ecc71", Dash = new() { 6, 4 }, Label = "Target" },
+                        new Annotation { Kind = AnnotationKind.Box, YMin = 0, YMax = 30, Color = "#ff6384", FillColor = "rgba(255,99,132,0.10)", LineWidth = 0, Label = "Low", DrawBehindDatasets = true }
+                    )
+                }
+            }
+        };
+
+        _box = new ChartOptions
+        {
+            Plugins = new PluginOptions
+            {
+                Legend = new LegendOptions { Display = false },
+                Custom =
+                {
+                    new AnnotationPlugin(
+                        new Annotation { Kind = AnnotationKind.Box, XIsIndex = true, XMin = 2, XMax = 4, Color = "#9966ff", FillColor = "rgba(153,102,255,0.12)", LineWidth = 1, DrawBehindDatasets = true },
+                        new Annotation { Orientation = LineOrientation.Vertical, XIsIndex = true, Value = 3, Color = "#ff9f40", LineWidth = 2, Label = "Launch" }
+                    )
+                }
+            }
+        };
+    }
+
+    private ChartData Series() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets = { new ChartDataset { Label = "Score", Data = SampleData.V(20, 45, 60, 35, 75, 90, 70), BorderColor = "#36a2eb", Tension = 0.4 } }
+    };
+
+    private ChartData Bars() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets = { new ChartDataset { Label = "Sales", Data = SampleData.V(30, 42, 55, 70, 64, 48, 52), BackgroundColor = "#36a2eb" } }
+    };
+}
