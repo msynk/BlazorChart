@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>
 /// Computes a <see cref="BlazorChartScene"/> (pure SVG primitives + interaction metadata) from a

@@ -1,7 +1,6 @@
 using System.Globalization;
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>
 /// Maps data values to pixel positions for a cartesian axis and computes ticks.

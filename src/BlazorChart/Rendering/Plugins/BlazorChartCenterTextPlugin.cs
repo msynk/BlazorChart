@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering.Plugins;
+namespace BlazorChart;
 
 /// <summary>
 /// Draws one or more lines of text in the center of a doughnut/pie chart — a very common

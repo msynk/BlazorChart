@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Animation options. For the SVG renderer these map to CSS transitions.</summary>
 public sealed class BlazorChartAnimationOptions

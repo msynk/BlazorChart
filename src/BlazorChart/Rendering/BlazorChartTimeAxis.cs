@@ -1,7 +1,6 @@
 using System.Globalization;
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>
 /// Generates nice tick boundaries and labels for a time scale. Axis values are stored as

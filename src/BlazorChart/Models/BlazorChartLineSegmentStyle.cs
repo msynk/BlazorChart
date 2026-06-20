@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>
 /// Per-segment line styling, mirroring Chart.js dataset <c>segment</c>. Each callback receives the

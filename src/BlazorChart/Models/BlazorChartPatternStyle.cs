@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Built-in hatch/pattern styles for fills.</summary>
 public enum BlazorChartPatternStyle

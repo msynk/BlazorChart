@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>
 /// A linear gradient fill. By default it runs vertically (top→bottom of the chart area),

@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Grid line configuration for a scale.</summary>
 public sealed class BlazorChartGridOptions

@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Stepped line rendering options.</summary>
 public enum BlazorChartSteppedLine

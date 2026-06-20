@@ -1,4 +1,4 @@
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 public sealed class BlazorChartSvgPath : BlazorChartSvgNode
 {

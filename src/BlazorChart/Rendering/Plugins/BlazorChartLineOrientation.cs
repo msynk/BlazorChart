@@ -1,3 +1,3 @@
-namespace BlazorChart.Rendering.Plugins;
+namespace BlazorChart;
 
 public enum BlazorChartLineOrientation { Horizontal, Vertical }

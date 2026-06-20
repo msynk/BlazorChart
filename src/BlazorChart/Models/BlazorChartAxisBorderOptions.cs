@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Axis border line configuration, mirroring Chart.js <c>scale.border</c>.</summary>
 public sealed class BlazorChartAxisBorderOptions

@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>BlazorChartPadding values mirroring Chart.js padding (number or per-side).</summary>
 public readonly record struct BlazorChartPadding(double Top, double Right, double Bottom, double Left)

@@ -1,4 +1,4 @@
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>A single item exposed to a custom tooltip template.</summary>
 public sealed class BlazorChartTooltipPoint

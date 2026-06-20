@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>A repeating SVG pattern fill (hatching, dots, grid, ...).</summary>
 public sealed class BlazorChartFillPattern

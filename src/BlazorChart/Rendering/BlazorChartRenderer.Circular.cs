@@ -1,7 +1,6 @@
 using System.Globalization;
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 public sealed partial class BlazorChartRenderer
 {
@@ -30,7 +29,7 @@ public sealed partial class BlazorChartRenderer
         double ringInner = maxR * cutout;
         double ringThickness = (ringOuter - ringInner) / datasets.Count;
 
-        var ctx = new Plugins.BlazorChartPluginContext
+        var ctx = new BlazorChartPluginContext
         {
             Scene = scene, Config = _config, IsCartesian = false,
             CenterX = cx, CenterY = cy, InnerRadius = ringInner, OuterRadius = ringOuter

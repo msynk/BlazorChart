@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering.Plugins;
+namespace BlazorChart;
 
 /// <summary>Context passed to plugins, exposing the scene, area and scale conversions.</summary>
 public sealed class BlazorChartPluginContext

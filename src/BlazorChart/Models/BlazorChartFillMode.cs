@@ -1,6 +1,6 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
-/// <summary>How <see cref="Models.LineFill"/> fills relative to a baseline.</summary>
+/// <summary>How <see cref="LineFill"/> fills relative to a baseline.</summary>
 public enum BlazorChartFillMode
 {
     None,

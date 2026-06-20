@@ -1,6 +1,4 @@
-@using global::BlazorChart.Models
-@using global::BlazorChart.Rendering
-@namespace BlazorChart.Components
+@namespace BlazorChart
 
 <div class="bc-root @Class" style="@RootStyle">
     @((MarkupString)AnimationStyles)
@@ -211,7 +209,7 @@
         </div>
     };
 
-    private RenderFragment RenderPattern(Rendering.BlazorChartPatternDef def) => __builder =>
+    private RenderFragment RenderPattern(BlazorChartPatternDef def) => __builder =>
     {
         var p = def.Pattern;
         double s = p.Size;

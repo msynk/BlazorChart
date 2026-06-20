@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>
 /// Tooltip text/styling callbacks, mirroring Chart.js <c>tooltip.callbacks</c>. Any callback

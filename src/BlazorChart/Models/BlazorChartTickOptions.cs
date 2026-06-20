@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Tick configuration for a scale.</summary>
 public sealed class BlazorChartTickOptions

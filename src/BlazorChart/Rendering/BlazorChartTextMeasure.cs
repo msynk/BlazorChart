@@ -1,4 +1,4 @@
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>
 /// Approximate text measurement without a canvas. Uses a per-character advance-width table

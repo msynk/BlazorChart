@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Point marker styles, mirroring Chart.js pointStyle.</summary>
 public enum BlazorChartPointStyle

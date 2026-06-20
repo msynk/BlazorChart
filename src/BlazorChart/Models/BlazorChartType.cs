@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>The built-in chart types, mirroring Chart.js.</summary>
 public enum BlazorChartType

@@ -1,7 +1,6 @@
 using System.Text;
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 public sealed partial class BlazorChartRenderer
 {

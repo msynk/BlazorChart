@@ -1,4 +1,4 @@
-using BlazorChart.Models;
+using BlazorChart;
 
 namespace BlazorChart.Demo;
 

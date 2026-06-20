@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>A legend entry.</summary>
 public sealed class BlazorChartLegendItemModel

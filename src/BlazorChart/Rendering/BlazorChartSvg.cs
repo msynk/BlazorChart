@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>Helpers for formatting numbers in an invariant, SVG-friendly way.</summary>
 public static class BlazorChartSvg

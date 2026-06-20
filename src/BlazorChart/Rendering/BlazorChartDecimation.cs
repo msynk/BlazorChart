@@ -1,4 +1,4 @@
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>Largest-Triangle-Three-Buckets downsampling for line series.</summary>
 public static class BlazorChartDecimation

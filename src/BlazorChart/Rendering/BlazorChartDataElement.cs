@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>An interactive data-driven element (bar, point, arc, ...).</summary>
 public sealed class BlazorChartDataElement

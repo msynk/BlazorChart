@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Legend label configuration.</summary>
 public sealed class BlazorChartLegendLabelOptions

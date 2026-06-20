@@ -1,4 +1,4 @@
-namespace BlazorChart.Rendering.Plugins;
+namespace BlazorChart;
 
 /// <summary>A single annotation (line, box, point or label).</summary>
 public sealed class BlazorChartAnnotation

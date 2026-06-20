@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Container for all plugin options, mirroring Chart.js <c>options.plugins</c>.</summary>
 public sealed class BlazorChartPluginOptions
@@ -11,5 +11,5 @@ public sealed class BlazorChartPluginOptions
     public BlazorChartDecimationOptions Decimation { get; set; } = new();
 
     /// <summary>User-registered drawing plugins (annotations, custom overlays, ...).</summary>
-    public List<Rendering.Plugins.IBlazorChartPlugin> Custom { get; set; } = new();
+    public List<IBlazorChartPlugin> Custom { get; set; } = new();
 }

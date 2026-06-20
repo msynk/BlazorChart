@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering.Plugins;
+namespace BlazorChart;
 
 /// <summary>
 /// A drawing plugin, mirroring the Chart.js plugin concept. Plugins receive a

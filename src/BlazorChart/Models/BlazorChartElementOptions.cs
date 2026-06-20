@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Default element options, mirroring Chart.js <c>options.elements</c>.</summary>
 public sealed class BlazorChartElementOptions

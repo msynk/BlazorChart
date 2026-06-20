@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 public sealed partial class BlazorChartRenderer
 {
@@ -127,7 +126,7 @@ public sealed partial class BlazorChartRenderer
         foreach (var (id, s) in xScales) scene.AxisRanges[id] = (s.Min, s.Max);
         foreach (var (id, s) in valueScales) scene.AxisRanges[id] = (s.Min, s.Max);
 
-        var ctx = new Plugins.BlazorChartPluginContext
+        var ctx = new BlazorChartPluginContext
         {
             Scene = scene,
             Config = _config,

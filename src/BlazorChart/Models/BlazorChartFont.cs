@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Font definition mirroring Chart.js Font options.</summary>
 public sealed class BlazorChartFont

@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>
 /// Contextual information passed to scriptable dataset options, mirroring Chart.js

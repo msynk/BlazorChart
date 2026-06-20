@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>
 /// The top-level chart configuration, mirroring the object you pass to <c>new Chart(ctx, config)</c>

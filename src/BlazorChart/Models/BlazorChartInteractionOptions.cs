@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Interaction options, mirroring Chart.js <c>options.interaction</c>.</summary>
 public sealed class BlazorChartInteractionOptions

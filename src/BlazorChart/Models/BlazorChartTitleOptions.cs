@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Title / subtitle plugin options.</summary>
 public sealed class BlazorChartTitleOptions

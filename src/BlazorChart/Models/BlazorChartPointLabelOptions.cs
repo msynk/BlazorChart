@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Point label configuration for radial (radar/polar) scales.</summary>
 public sealed class BlazorChartPointLabelOptions

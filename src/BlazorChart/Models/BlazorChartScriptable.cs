@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>
 /// A value that is either a constant or a function of <see cref="BlazorChartScriptableContext"/>.

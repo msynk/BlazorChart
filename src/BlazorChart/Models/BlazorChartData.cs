@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>The chart data, mirroring Chart.js <c>data</c>: labels + datasets.</summary>
 public sealed class BlazorChartData

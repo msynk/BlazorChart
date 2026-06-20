@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>
 /// A scale/axis definition, mirroring Chart.js cartesian and radial scale options.

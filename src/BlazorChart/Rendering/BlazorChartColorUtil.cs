@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>Color helpers (parse hex/rgb/rgba, apply alpha, build palettes).</summary>
 public static class BlazorChartColorUtil

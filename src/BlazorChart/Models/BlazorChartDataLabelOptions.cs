@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Data label plugin options (renders values on the chart).</summary>
 public sealed class BlazorChartDataLabelOptions

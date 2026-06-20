@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>Tooltip payload attached to an interactive data element.</summary>
 public sealed class BlazorChartTooltipInfo

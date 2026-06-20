@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>
 /// A single tooltip item exposed to tooltip callbacks, mirroring Chart.js <c>BlazorChartTooltipItem</c>.

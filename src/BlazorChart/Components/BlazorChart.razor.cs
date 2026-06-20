@@ -1,10 +1,8 @@
-using BlazorChart.Models;
-using BlazorChart.Rendering;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
-namespace BlazorChart.Components;
+namespace BlazorChart;
 
 /// <summary>
 /// A native Blazor chart component rendered entirely with SVG (no JavaScript or canvas).

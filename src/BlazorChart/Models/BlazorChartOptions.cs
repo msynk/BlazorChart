@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>
 /// Top-level chart options, mirroring Chart.js <c>options</c>.

@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>BlazorChartDecimation (downsampling) options for large line datasets.</summary>
 public sealed class BlazorChartDecimationOptions

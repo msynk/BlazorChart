@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>Builds SVG marker shapes for the Chart.js point styles.</summary>
 public static class BlazorChartPointShapes

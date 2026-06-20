@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>A registered pattern definition referenced by id.</summary>
 public sealed record BlazorChartPatternDef(string Id, BlazorChartFillPattern Pattern);

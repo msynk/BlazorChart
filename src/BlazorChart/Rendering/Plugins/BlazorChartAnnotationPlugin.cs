@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering.Plugins;
+namespace BlazorChart;
 
 /// <summary>
 /// Draws line/box/point/label annotations over a cartesian chart, mirroring the popular

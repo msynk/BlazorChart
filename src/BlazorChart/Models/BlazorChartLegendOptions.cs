@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Legend plugin options.</summary>
 public sealed class BlazorChartLegendOptions

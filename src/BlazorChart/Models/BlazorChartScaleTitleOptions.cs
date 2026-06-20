@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Axis title configuration.</summary>
 public sealed class BlazorChartScaleTitleOptions

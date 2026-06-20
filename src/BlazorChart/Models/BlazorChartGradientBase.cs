@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Base type for gradient fills (linear or radial).</summary>
 public abstract class BlazorChartGradientBase

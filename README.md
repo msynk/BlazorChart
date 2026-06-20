@@ -42,11 +42,10 @@ The JavaScript module for responsive sizing and zoom is loaded automatically fro
 
 ## Usage
 
-Import the namespaces, typically in `_Imports.razor`:
+Import the namespace, typically in `_Imports.razor`:
 
 ```razor
-@using BlazorChart.Components
-@using BlazorChart.Models
+@using BlazorChart
 ```
 
 ### Quick start

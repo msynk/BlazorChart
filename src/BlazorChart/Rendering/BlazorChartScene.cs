@@ -1,6 +1,5 @@
-using BlazorChart.Models;
 
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>The full computed scene the component renders.</summary>
 public sealed class BlazorChartScene

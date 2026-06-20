@@ -1,4 +1,4 @@
-namespace BlazorChart.Rendering;
+namespace BlazorChart;
 
 /// <summary>Mutable interaction state shared with the component (hover + legend toggles).</summary>
 public sealed class BlazorChartRenderState

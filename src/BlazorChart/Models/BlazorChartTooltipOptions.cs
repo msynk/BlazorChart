@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Tooltip plugin options.</summary>
 public sealed class BlazorChartTooltipOptions

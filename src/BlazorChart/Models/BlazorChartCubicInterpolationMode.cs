@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Cubic interpolation mode for line smoothing, mirroring Chart.js.</summary>
 public enum BlazorChartCubicInterpolationMode

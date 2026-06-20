@@ -1,4 +1,4 @@
-namespace BlazorChart.Models;
+namespace BlazorChart;
 
 /// <summary>Generic position used by axes, legend and title.</summary>
 public enum BlazorChartPosition
