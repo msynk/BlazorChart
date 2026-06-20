@@ -1,0 +1,62 @@
+@page "/mixed"
+
+<PageTitle>Mixed charts</PageTitle>
+
+<div class="page-head">
+    <h1>Mixed charts</h1>
+    <p>Combine bar and line datasets on the same chart, optionally with a second y axis. Each dataset can set its own <code>Type</code>.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Bar + line</h3>
+        <p class="desc">line drawn on top of bars</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="@BarLine()" Options="_bottom" />
+    </div>
+
+    <div class="card">
+        <h3>Dual axis</h3>
+        <p class="desc">revenue (left) vs. margin % (right)</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="@DualAxis()" Options="@_dual" />
+    </div>
+</div>
+
+@code {
+    private readonly BlazorChartOptions _bottom = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+    };
+
+    private readonly BlazorChartOptions _dual = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },
+        Scales =
+        {
+            ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Position = BlazorChartPosition.Left, BeginAtZero = true,
+                Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Revenue ($k)" } },
+            ["y2"] = new BlazorChartScaleOptions { Id = "y2", Type = BlazorChartScaleType.Linear, Position = BlazorChartPosition.Right, BeginAtZero = true,
+                Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Margin %" },
+                Grid = new BlazorChartGridOptions { DrawOnChartArea = false } }
+        }
+    };
+
+    private BlazorChartData BarLine() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset { Type = BlazorChartType.Bar, Label = "Units", Data = SampleData.V(40, 55, 48, 70, 62, 80, 75), BackgroundColor = "#36a2eb" },
+            new BlazorChartDataset { Type = BlazorChartType.Line, Label = "Trend", Data = SampleData.V(38, 50, 52, 64, 68, 76, 80), BorderColor = "#ff6384", Tension = 0.4 }
+        }
+    };
+
+    private BlazorChartData DualAxis() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset { Type = BlazorChartType.Bar, Label = "Revenue", YAxisID = "y", Data = SampleData.V(120, 150, 130, 180, 165, 210, 195), BackgroundColor = "#36a2eb" },
+            new BlazorChartDataset { Type = BlazorChartType.Line, Label = "Margin", YAxisID = "y2", Data = SampleData.V(18, 22, 20, 26, 24, 30, 28), BorderColor = "#ff9f40", Tension = 0.3 }
+        }
+    };
+}

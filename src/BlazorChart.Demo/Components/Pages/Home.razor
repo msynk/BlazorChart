@@ -1,0 +1,42 @@
+@page "/"
+
+<PageTitle>BlazorChart — Overview</PageTitle>
+
+<div class="page-head">
+    <h1>BlazorChart</h1>
+    <p>
+        A charting component written entirely in C# and Razor. Every pixel is drawn with
+        SVG &mdash; no JavaScript, no canvas, no <code>Chart.js</code> dependency. The configuration
+        model mirrors Chart.js (<code>type</code> / <code>data</code> / <code>options</code>) so it feels familiar.
+    </p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Line</h3>
+        <p class="desc">Smooth curves, multiple series, hover tooltips.</p>
+        <BlazorChart Type="BlazorChartType.Line" Data="SampleData.MonthlySales()" Options="_basic" />
+    </div>
+    <div class="card">
+        <h3>Bar</h3>
+        <p class="desc">Grouped categories with a value axis.</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="SampleData.Revenue()" Options="_basic" />
+    </div>
+    <div class="card">
+        <h3>Doughnut</h3>
+        <p class="desc">Proportional slices with a cutout center.</p>
+        <BlazorChart Type="BlazorChartType.Doughnut" Data="SampleData.Traffic()" />
+    </div>
+    <div class="card">
+        <h3>Radar</h3>
+        <p class="desc">Multi-axis comparison across categories.</p>
+        <BlazorChart Type="BlazorChartType.Radar" Data="SampleData.Skills()" />
+    </div>
+</div>
+
+@code {
+    private readonly BlazorChartOptions _basic = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+    };
+}

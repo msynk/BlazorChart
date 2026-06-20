@@ -174,13 +174,13 @@ src/BlazorChart/        The charting library (Razor Class Library)
   Models/               Config, data, options, enums, scales, plugins
   Rendering/            Scene/geometry computation, scales, plugins
   wwwroot/              chart-interop.js (resize + zoom)
-demo/BlazorChart.Demo/  A Blazor Web App demonstrating every feature
+src/BlazorChart.Demo/  A Blazor Web App demonstrating every feature
 ```
 
 ## Running the demo
 
 ```bash
-dotnet run --project demo/BlazorChart.Demo
+dotnet run --project src/BlazorChart.Demo
 ```
 
 The demo includes pages for line, bar, area, pie, doughnut, polar, radar, scatter, mixed, multi-axis, time, scales, legends, tooltips, annotations, animations, scriptable options, zoom, and a live playground.
@@ -188,5 +188,5 @@ The demo includes pages for line, bar, area, pie, doughnut, polar, radar, scatte
 ## Building
 
 ```bash
-dotnet build BlazorChart.slnx
+dotnet build src/BlazorChart.slnx
 ```

@@ -1,0 +1,195 @@
+@page "/bar"
+
+<PageTitle>Bar charts</PageTitle>
+
+<div class="page-head">
+    <h1>Bar charts</h1>
+    <p>Grouped, stacked, horizontal, per-bar colors and rounded corners.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Grouped</h3>
+        <p class="desc">three datasets side by side</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="SampleData.Revenue()" Options="_bottom" />
+    </div>
+
+    <div class="card">
+        <h3>Stacked</h3>
+        <p class="desc">scales.y.stacked = true</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="SampleData.Revenue()" Options="@_stacked" />
+    </div>
+
+    <div class="card">
+        <h3>Horizontal</h3>
+        <p class="desc">indexAxis = y</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="@PerColor()" Options="@_horizontal" />
+    </div>
+
+    <div class="card">
+        <h3>Rounded + per-bar colors</h3>
+        <p class="desc">borderRadius, palette per index</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="@PerColor()" Options="@_rounded" />
+    </div>
+
+    <div class="card">
+        <h3>Floating bars</h3>
+        <p class="desc">each bar spans a [low, high] range</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="@Floating()" Options="_noLegend" />
+    </div>
+
+    <div class="card">
+        <h3>100% stacked</h3>
+        <p class="desc">scales.y.stacked100 normalizes each category</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="SampleData.Revenue()" Options="@_stacked100" />
+    </div>
+
+    <div class="card">
+        <h3>Pattern fills</h3>
+        <p class="desc">hatch &amp; dot patterns (print-friendly)</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="@Patterned()" Options="_bottom" />
+    </div>
+
+    <div class="card">
+        <h3>Top-rounded corners</h3>
+        <p class="desc">per-corner borderRadius</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="@TopRounded()" Options="_noLegend" />
+    </div>
+
+    <div class="card">
+        <h3>Auto-rotated labels</h3>
+        <p class="desc">long category labels tilt to fit</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="SampleData.Countries()" Options="_noLegend" />
+    </div>
+
+    <div class="card">
+        <h3>Stacked groups</h3>
+        <p class="desc">two independent stacks side by side (Stack id)</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="@StackedGroups()" Options="@_stackedGroups" />
+    </div>
+</div>
+
+@code {
+    private readonly BlazorChartOptions _bottom = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+    };
+
+    private readonly BlazorChartOptions _stacked = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },
+        Scales =
+        {
+            ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Category, Stacked = true },
+            ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Stacked = true, BeginAtZero = true }
+        }
+    };
+
+    private readonly BlazorChartOptions _horizontal = new()
+    {
+        IndexAxis = BlazorChartIndexAxis.Y,
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } }
+    };
+
+    private readonly BlazorChartOptions _rounded = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } }
+    };
+
+    private readonly BlazorChartOptions _noLegend = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } }
+    };
+
+    private readonly BlazorChartOptions _stacked100 = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },
+        Scales =
+        {
+            ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Category, Stacked = true },
+            ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Stacked = true, Stacked100 = true, Ticks = new BlazorChartTickOptions { Suffix = "%" } }
+        }
+    };
+
+    private BlazorChartData Floating() => new()
+    {
+        Labels = { "Mon", "Tue", "Wed", "Thu", "Fri" },
+        Datasets =
+        {
+            new BlazorChartDataset
+            {
+                Label = "Temp range (°C)",
+                BackgroundColor = "#ff9f40",
+                BorderRadius = 4,
+                RangeData = new()
+                {
+                    (8, 16), (10, 19), (7, 14), (11, 21), (9, 18)
+                }
+            }
+        }
+    };
+
+    private BlazorChartData Patterned() => new()
+    {
+        Labels = { "Alpha", "Beta", "Gamma", "Delta" },
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "A", Data = SampleData.V(40, 55, 35, 60), BorderColor = "#36a2eb", BorderWidth = 1,
+                BackgroundPattern = new BlazorChartFillPattern(BlazorChartPatternStyle.DiagonalUp, "#36a2eb", "rgba(54,162,235,0.12)") },
+            new BlazorChartDataset { Label = "B", Data = SampleData.V(28, 42, 50, 33), BorderColor = "#ff6384", BorderWidth = 1,
+                BackgroundPattern = new BlazorChartFillPattern(BlazorChartPatternStyle.Dots, "#ff6384", "rgba(255,99,132,0.10)") }
+        }
+    };
+
+    private BlazorChartData PerColor() => new()
+    {
+        Labels = { "Red", "Blue", "Teal", "Orange", "Purple" },
+        Datasets =
+        {
+            new BlazorChartDataset
+            {
+                Label = "Votes",
+                Data = SampleData.V(12, 19, 7, 15, 9),
+                BackgroundColors = new() { "#ff6384", "#36a2eb", "#4bc0c0", "#ff9f40", "#9966ff" },
+                BorderRadius = 6
+            }
+        }
+    };
+
+    private BlazorChartData TopRounded() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset
+            {
+                Label = "Throughput",
+                Data = SampleData.V(40, 65, 50, 80, 60, 72, 55),
+                BackgroundColor = "#36a2eb",
+                BorderRadiusCorners = BlazorChartBorderRadiusCorners.Top(10)
+            }
+        }
+    };
+
+    private readonly BlazorChartOptions _stackedGroups = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },
+        Scales =
+        {
+            ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Category, Stacked = true },
+            ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Stacked = true, BeginAtZero = true }
+        }
+    };
+
+    private BlazorChartData StackedGroups() => new()
+    {
+        Labels = { "Q1", "Q2", "Q3", "Q4" },
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "2025 · New", Stack = "2025", Data = SampleData.V(20, 28, 24, 32), BackgroundColor = "#36a2eb" },
+            new BlazorChartDataset { Label = "2025 · Renew", Stack = "2025", Data = SampleData.V(12, 16, 14, 18), BackgroundColor = "#9cd0f5" },
+            new BlazorChartDataset { Label = "2026 · New", Stack = "2026", Data = SampleData.V(26, 30, 29, 38), BackgroundColor = "#ff6384" },
+            new BlazorChartDataset { Label = "2026 · Renew", Stack = "2026", Data = SampleData.V(15, 18, 17, 22), BackgroundColor = "#ffb1c1" }
+        }
+    };
+}

@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/demo/">
+    <Project Path="BlazorChart.Demo/BlazorChart.Demo.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="BlazorChart/BlazorChart.csproj" />
+  </Folder>
+</Solution>

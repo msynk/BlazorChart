@@ -1,0 +1,41 @@
+using BlazorChart.Models;
+
+namespace BlazorChart.Rendering;
+
+/// <summary>The full computed scene the component renders.</summary>
+public sealed class BlazorChartScene
+{
+    public double Width { get; set; }
+    public double Height { get; set; }
+
+    public List<BlazorChartSvgNode> Background { get; } = new();
+    /// <summary>Series paths (lines + area fills) drawn above the grid and below the data points.
+    /// Rendered in an animated group so every line — solid, dashed or per-segment — animates uniformly.</summary>
+    public List<BlazorChartSvgNode> Series { get; } = new();
+    public List<BlazorChartDataElement> Elements { get; } = new();
+    public List<BlazorChartSvgNode> Foreground { get; } = new();
+
+    /// <summary>Gradient definitions referenced via url(#id).</summary>
+    public List<BlazorChartGradientDef> Defs { get; } = new();
+
+    /// <summary>Pattern definitions referenced via url(#id).</summary>
+    public List<BlazorChartPatternDef> Patterns { get; } = new();
+
+    public BlazorChartLegendModel? Legend { get; set; }
+    public BlazorChartTitleModel? Title { get; set; }
+    public BlazorChartTitleModel? Subtitle { get; set; }
+
+    /// <summary>The cartesian plotting area (null for circular/radar charts).</summary>
+    public BlazorChartArea? PlotArea { get; set; }
+    /// <summary>True for pie/doughnut/polar/radar charts.</summary>
+    public bool IsRadialOrCircular { get; set; }
+    /// <summary>True when the cartesian chart contains bar datasets.</summary>
+    public bool HasBars { get; set; }
+    /// <summary>True when bars are horizontal (indexAxis = y).</summary>
+    public bool HorizontalBars { get; set; }
+
+    /// <summary>Effective value range per axis id after data/zoom resolution.</summary>
+    public Dictionary<string, (double Min, double Max)> AxisRanges { get; } = new();
+    /// <summary>Axis ids that support zoom/pan (linear/time/logarithmic).</summary>
+    public HashSet<string> ZoomableAxes { get; } = new();
+}

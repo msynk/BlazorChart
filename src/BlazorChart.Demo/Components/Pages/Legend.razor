@@ -1,0 +1,104 @@
+@page "/legend"
+
+<PageTitle>Legend</PageTitle>
+
+<div class="page-head">
+    <h1>Legend</h1>
+    <p>Position, alignment, a legend title, point-style markers and reversed order. Click any item to toggle its dataset &mdash; the chart recomputes instantly.</p>
+</div>
+
+<div class="controls">
+    <label>
+        Position
+        <select @bind="_position">
+            <option value="@BlazorChartPosition.Top">Top</option>
+            <option value="@BlazorChartPosition.Bottom">Bottom</option>
+            <option value="@BlazorChartPosition.Left">Left</option>
+            <option value="@BlazorChartPosition.Right">Right</option>
+        </select>
+    </label>
+    <label>
+        Align
+        <select @bind="_align">
+            <option value="@BlazorChartAlign.Start">Start</option>
+            <option value="@BlazorChartAlign.Center">Center</option>
+            <option value="@BlazorChartAlign.End">End</option>
+        </select>
+    </label>
+    <label><input type="checkbox" @bind="_usePointStyle" /> Point style</label>
+    <label><input type="checkbox" @bind="_reverse" /> Reverse</label>
+</div>
+
+<div class="card" style="margin-bottom:22px">
+    <BlazorChart Type="BlazorChartType.Line" Data="@MultiSeries()" Options="@Live()" />
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Legend title</h3>
+        <p class="desc">a heading above the items</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="SampleData.Revenue()" Options="@_titled" />
+    </div>
+
+    <div class="card">
+        <h3>Point-style markers</h3>
+        <p class="desc">usePointStyle uses each dataset's marker</p>
+        <BlazorChart Type="BlazorChartType.Line" Data="@Markers()" Options="@_pointStyle" />
+    </div>
+</div>
+
+@code {
+    private BlazorChartPosition _position = BlazorChartPosition.Top;
+    private BlazorChartAlign _align = BlazorChartAlign.Center;
+    private bool _usePointStyle;
+    private bool _reverse;
+
+    private BlazorChartOptions Live() => new()
+    {
+        Plugins = new BlazorChartPluginOptions
+        {
+            Legend = new BlazorChartLegendOptions
+            {
+                Position = _position, Align = _align, Reverse = _reverse,
+                Labels = new BlazorChartLegendLabelOptions { UsePointStyle = _usePointStyle }
+            }
+        }
+    };
+
+    private readonly BlazorChartOptions _titled = new()
+    {
+        Plugins = new BlazorChartPluginOptions
+        {
+            Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom, Title = "Product lines" }
+        }
+    };
+
+    private readonly BlazorChartOptions _pointStyle = new()
+    {
+        Plugins = new BlazorChartPluginOptions
+        {
+            Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom, Labels = new BlazorChartLegendLabelOptions { UsePointStyle = true } }
+        }
+    };
+
+    private BlazorChartData MultiSeries() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Alpha", Data = SampleData.V(65, 59, 80, 81, 56, 55, 72), BorderColor = "#36a2eb", BackgroundColor = "#36a2eb", Tension = 0.3 },
+            new BlazorChartDataset { Label = "Beta", Data = SampleData.V(28, 48, 40, 60, 86, 92, 78), BorderColor = "#ff6384", BackgroundColor = "#ff6384", Tension = 0.3 },
+            new BlazorChartDataset { Label = "Gamma", Data = SampleData.V(40, 35, 60, 45, 70, 50, 65), BorderColor = "#4bc0c0", BackgroundColor = "#4bc0c0", Tension = 0.3 }
+        }
+    };
+
+    private BlazorChartData Markers() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Stars", Data = SampleData.V(20, 35, 28, 45, 38, 52, 44), BorderColor = "#ff9f40", PointBackgroundColor = "#ff9f40", PointStyle = BlazorChartPointStyle.Star, PointRadius = 6, Tension = 0.3 },
+            new BlazorChartDataset { Label = "Triangles", Data = SampleData.V(12, 22, 18, 30, 26, 38, 32), BorderColor = "#9966ff", PointBackgroundColor = "#9966ff", PointStyle = BlazorChartPointStyle.Triangle, PointRadius = 6, Tension = 0.3 }
+        }
+    };
+}

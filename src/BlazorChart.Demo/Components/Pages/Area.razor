@@ -1,0 +1,127 @@
+@page "/area"
+
+<PageTitle>Area &amp; Gradients</PageTitle>
+
+<div class="page-head">
+    <h1>Area &amp; Gradients</h1>
+    <p>Gradient area fills, stacked areas (cumulative), and range charts that fill between two datasets.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Gradient fill</h3>
+        <p class="desc">vertical gradient under a smooth line</p>
+        <BlazorChart Type="BlazorChartType.Line" Data="@Gradient()" Options="_noLegend" />
+    </div>
+
+    <div class="card">
+        <h3>Stacked area</h3>
+        <p class="desc">scales.y.stacked, three cumulative series</p>
+        <BlazorChart Type="BlazorChartType.Line" Data="@Stacked()" Options="@_stacked" />
+    </div>
+
+    <div class="card">
+        <h3>Range (fill between datasets)</h3>
+        <p class="desc">upper fills down to lower (BlazorChartFillMode.Dataset)</p>
+        <BlazorChart Type="BlazorChartType.Line" Data="@Range()" Options="_legendBottom" />
+    </div>
+
+    <div class="card">
+        <h3>Fill boundaries</h3>
+        <p class="desc">origin, start (top) and end (bottom) baselines</p>
+        <BlazorChart Type="BlazorChartType.Line" Data="@Boundaries()" Options="_legendBottom" />
+    </div>
+
+    <div class="card">
+        <h3>Radial gradient</h3>
+        <p class="desc">center→edge radial fill under the line</p>
+        <BlazorChart Type="BlazorChartType.Line" Data="@RadialFill()" Options="_noLegend" />
+    </div>
+</div>
+
+@code {
+    private readonly BlazorChartOptions _noLegend = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } }
+    };
+
+    private readonly BlazorChartOptions _legendBottom = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+    };
+
+    private readonly BlazorChartOptions _stacked = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },
+        Scales =
+        {
+            ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Category },
+            ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Stacked = true, BeginAtZero = true }
+        }
+    };
+
+    private BlazorChartData Gradient() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset
+            {
+                Label = "Sessions",
+                Data = SampleData.V(120, 190, 160, 250, 220, 300, 280),
+                BorderColor = "#36a2eb",
+                Tension = 0.4,
+                Fill = BlazorChartFillMode.Origin,
+                FillGradient = BlazorChartLinearGradient.Vertical2("rgba(54,162,235,0.55)", "rgba(54,162,235,0.02)")
+            }
+        }
+    };
+
+    private BlazorChartData Stacked() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Organic", Data = SampleData.V(30, 40, 35, 50, 45, 60, 55), BorderColor = "#36a2eb", Fill = BlazorChartFillMode.Stack },
+            new BlazorChartDataset { Label = "Paid", Data = SampleData.V(20, 25, 30, 28, 35, 30, 40), BorderColor = "#ff6384", Fill = BlazorChartFillMode.Stack },
+            new BlazorChartDataset { Label = "Referral", Data = SampleData.V(10, 12, 15, 18, 14, 20, 22), BorderColor = "#4bc0c0", Fill = BlazorChartFillMode.Stack }
+        }
+    };
+
+    private BlazorChartData Range() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Max", Data = SampleData.V(28, 32, 30, 36, 40, 44, 42), BorderColor = "#ff9f40", Fill = BlazorChartFillMode.Dataset, FillTargetIndex = 1, FillColor = "rgba(255,159,64,0.18)" },
+            new BlazorChartDataset { Label = "Min", Data = SampleData.V(14, 16, 15, 20, 24, 26, 23), BorderColor = "#36a2eb", Fill = BlazorChartFillMode.None }
+        }
+    };
+
+    private BlazorChartData Boundaries() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Origin", Data = SampleData.V(10, -20, 30, -10, 25, -5, 15), BorderColor = "#36a2eb", Fill = BlazorChartFillMode.Origin, FillColor = "rgba(54,162,235,0.15)", Tension = 0.3 },
+            new BlazorChartDataset { Label = "Start (top)", Data = SampleData.V(40, 35, 45, 38, 50, 44, 55), BorderColor = "#ff6384", Fill = BlazorChartFillMode.Start, FillColor = "rgba(255,99,132,0.12)", Tension = 0.3 }
+        }
+    };
+
+    private BlazorChartData RadialFill() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset
+            {
+                Label = "Signal",
+                Data = SampleData.V(120, 190, 160, 250, 220, 300, 280),
+                BorderColor = "#9966ff",
+                Tension = 0.4,
+                Fill = BlazorChartFillMode.Origin,
+                FillGradient = BlazorChartRadialGradient.Center2("rgba(153,102,255,0.55)", "rgba(153,102,255,0.03)")
+            }
+        }
+    };
+}

@@ -1,0 +1,79 @@
+@page "/playground"
+
+<PageTitle>Playground</PageTitle>
+
+<div class="page-head">
+    <h1>Playground</h1>
+    <p>Switch chart type and options live against the same dataset. The chart recomputes instantly &mdash; all in C#.</p>
+</div>
+
+<div class="controls">
+    <label>
+        Type
+        <select @bind="_type">
+            @foreach (var t in Enum.GetValues<BlazorChartType>())
+            {
+                <option value="@t">@t</option>
+            }
+        </select>
+    </label>
+    <label>
+        Legend
+        <select @bind="_legend">
+            <option value="@BlazorChartPosition.Top">Top</option>
+            <option value="@BlazorChartPosition.Bottom">Bottom</option>
+            <option value="@BlazorChartPosition.Left">Left</option>
+            <option value="@BlazorChartPosition.Right">Right</option>
+        </select>
+    </label>
+    <label><input type="checkbox" @bind="_showLegend" /> Show legend</label>
+    <label><input type="checkbox" @bind="_fill" /> Fill area</label>
+    <label><input type="checkbox" @bind="_stacked" /> Stacked</label>
+    <label>
+        Tension
+        <input type="number" step="0.1" min="0" max="1" @bind="_tension" style="width:70px" />
+    </label>
+</div>
+
+<div class="card">
+    <BlazorChart Config="@BuildConfig()" />
+</div>
+
+@code {
+    private BlazorChartType _type = BlazorChartType.Bar;
+    private BlazorChartPosition _legend = BlazorChartPosition.Top;
+    private bool _showLegend = true;
+    private bool _fill = false;
+    private bool _stacked = false;
+    private double _tension = 0.3;
+
+    private BlazorChartConfig BuildConfig()
+    {
+        var data = new BlazorChartData
+        {
+            Labels = SampleData.Months.ToList(),
+            Datasets =
+            {
+                new BlazorChartDataset { Label = "Alpha", Data = SampleData.V(65, 59, 80, 81, 56, 55, 72),
+                    Tension = _tension, Fill = _fill ? BlazorChartFillMode.Origin : BlazorChartFillMode.None },
+                new BlazorChartDataset { Label = "Beta", Data = SampleData.V(28, 48, 40, 60, 86, 92, 78),
+                    Tension = _tension, Fill = _fill ? BlazorChartFillMode.Origin : BlazorChartFillMode.None }
+            }
+        };
+
+        var options = new BlazorChartOptions
+        {
+            Plugins = new BlazorChartPluginOptions
+            {
+                Legend = new BlazorChartLegendOptions { Display = _showLegend, Position = _legend }
+            },
+            Scales =
+            {
+                ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Category, Stacked = _stacked },
+                ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Stacked = _stacked, BeginAtZero = true }
+            }
+        };
+
+        return new BlazorChartConfig(_type, data, options);
+    }
+}

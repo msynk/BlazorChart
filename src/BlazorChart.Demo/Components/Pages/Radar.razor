@@ -1,0 +1,75 @@
+@page "/radar"
+
+<PageTitle>Radar charts</PageTitle>
+
+<div class="page-head">
+    <h1>Radar charts</h1>
+    <p>Compare multiple series across shared categories on a radial axis with angle lines and a filled web.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Two players</h3>
+        <p class="desc">filled areas</p>
+        <BlazorChart Type="BlazorChartType.Radar" Data="SampleData.Skills()" Options="_bottom" />
+    </div>
+
+    <div class="card">
+        <h3>Outline only</h3>
+        <p class="desc">no fill, thicker borders</p>
+        <BlazorChart Type="BlazorChartType.Radar" Data="@Outline()" Options="_bottom" />
+    </div>
+
+    <div class="card">
+        <h3>Circular grid</h3>
+        <p class="desc">grid.circular + styled point labels &amp; backdrop</p>
+        <BlazorChart Type="BlazorChartType.Radar" Data="SampleData.Skills()" Options="@_circular" />
+    </div>
+
+    <div class="card">
+        <h3>Skipped points</h3>
+        <p class="desc">null values are skipped, not zeroed</p>
+        <BlazorChart Type="BlazorChartType.Radar" Data="@Skip()" Options="_bottom" />
+    </div>
+</div>
+
+@code {
+    private readonly BlazorChartOptions _bottom = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+    };
+
+    private readonly BlazorChartOptions _circular = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },
+        Scales =
+        {
+            ["r"] = new BlazorChartScaleOptions
+            {
+                Id = "r", Type = BlazorChartScaleType.RadialLinear, BeginAtZero = true,
+                Grid = new BlazorChartGridOptions { Circular = true },
+                AngleLineColor = "rgba(0,0,0,0.15)",
+                PointLabels = new BlazorChartPointLabelOptions { Color = "#36a2eb", Font = new BlazorChartFont { Size = 12, Weight = "bold" } }
+            }
+        }
+    };
+
+    private BlazorChartData Outline() => new()
+    {
+        Labels = { "HTML", "CSS", "JS", "C#", "SQL", "DevOps" },
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Team A", Data = SampleData.V(90, 75, 80, 95, 60, 70), BorderColor = "#36a2eb", Fill = BlazorChartFillMode.None, BorderWidth = 2 },
+            new BlazorChartDataset { Label = "Team B", Data = SampleData.V(70, 85, 65, 60, 90, 80), BorderColor = "#ff9f40", Fill = BlazorChartFillMode.None, BorderWidth = 2 }
+        }
+    };
+
+    private BlazorChartData Skip() => new()
+    {
+        Labels = { "Speed", "Power", "Range", "Defense", "Agility", "Stamina" },
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Scouted", Data = SampleData.V(80, 65, null, 60, 85, null), BorderColor = "#9966ff", Fill = BlazorChartFillMode.Origin }
+        }
+    };
+}

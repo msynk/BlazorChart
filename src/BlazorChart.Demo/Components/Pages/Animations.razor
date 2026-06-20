@@ -1,0 +1,86 @@
+@page "/animations"
+
+<PageTitle>Animations</PageTitle>
+
+<div class="page-head">
+    <h1>Animations</h1>
+    <p>Entry and update animations are driven by CSS transitions in the browser &mdash; smooth value interpolation, a draw-on effect for lines, and optional per-element stagger.</p>
+</div>
+
+<div class="controls">
+    <label>
+        Duration
+        <input type="range" min="0" max="2000" step="100" @bind="_duration" @bind:event="oninput" />
+        <span>@_duration ms</span>
+    </label>
+    <label>
+        Easing
+        <select @bind="_easing">
+            <option value="ease-out">ease-out</option>
+            <option value="ease-in-out">ease-in-out</option>
+            <option value="cubic-bezier(.34,1.56,.64,1)">spring</option>
+            <option value="linear">linear</option>
+        </select>
+    </label>
+    <label>
+        Stagger
+        <input type="range" min="0" max="120" step="10" @bind="_stagger" @bind:event="oninput" />
+        <span>@_stagger ms/el</span>
+    </label>
+    <button class="btn" @onclick="Randomize">Randomize data</button>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Bars</h3>
+        <p class="desc">staggered rise + value transitions</p>
+        <BlazorChart Type="BlazorChartType.Bar" Data="@_data" Options="@Opts()" />
+    </div>
+
+    <div class="card">
+        <h3>Line draw-on</h3>
+        <p class="desc">path animates in, points follow</p>
+        <BlazorChart Type="BlazorChartType.Line" Data="@LineData()" Options="@Opts()" />
+    </div>
+</div>
+
+@code {
+    private int _duration = 800;
+    private string _easing = "cubic-bezier(.34,1.56,.64,1)";
+    private int _stagger = 60;
+    private BlazorChartData _data = Build();
+    private readonly Random _rnd = new();
+
+    private BlazorChartOptions Opts() => new()
+    {
+        Animation = new BlazorChartAnimationOptions { Duration = _duration, Easing = _easing, DelayBetween = _stagger },
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } }
+    };
+
+    private static BlazorChartData Build() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Value", Data = SampleData.V(40, 65, 50, 80, 60, 72, 55),
+                BackgroundColor = "#36a2eb", BorderRadius = 6 }
+        }
+    };
+
+    private BlazorChartData LineData() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Trend", Data = _data.Datasets[0].Data, BorderColor = "#9966ff",
+                Tension = 0.4, PointRadius = 4, PointBackgroundColor = "#9966ff" }
+        }
+    };
+
+    private void Randomize()
+    {
+        var d = _data.Datasets[0].Data;
+        for (int i = 0; i < d.Count; i++) d[i] = _rnd.Next(20, 100);
+        _data = new BlazorChartData { Labels = _data.Labels, Datasets = { _data.Datasets[0] } };
+    }
+}

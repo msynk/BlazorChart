@@ -1,0 +1,51 @@
+@page "/polar"
+
+<PageTitle>Polar area</PageTitle>
+
+<div class="page-head">
+    <h1>Polar area</h1>
+    <p>Equal-angle slices whose radius is driven by value, drawn over a radial grid.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Polar area</h3>
+        <p class="desc">click legend to toggle slices</p>
+        <BlazorChart Type="BlazorChartType.PolarArea" Data="@Data()" Options="_right" />
+    </div>
+
+    <div class="card">
+        <h3>Centered point labels</h3>
+        <p class="desc">category labels around the perimeter</p>
+        <BlazorChart Type="BlazorChartType.PolarArea" Data="@Data()" Options="@_labels" />
+    </div>
+</div>
+
+@code {
+    private readonly BlazorChartOptions _right = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Right } }
+    };
+
+    private readonly BlazorChartOptions _labels = new()
+    {
+        Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+        Scales =
+        {
+            ["r"] = new BlazorChartScaleOptions
+            {
+                Id = "r", Type = BlazorChartScaleType.RadialLinear,
+                PointLabels = new BlazorChartPointLabelOptions { Color = "#36507a", Font = new BlazorChartFont { Size = 12, Weight = "bold" } }
+            }
+        }
+    };
+
+    private BlazorChartData Data() => new()
+    {
+        Labels = { "Red", "Green", "Yellow", "Grey", "Blue" },
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Votes", Data = SampleData.V(11, 16, 7, 14, 20) }
+        }
+    };
+}

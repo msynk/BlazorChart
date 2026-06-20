@@ -1,0 +1,81 @@
+@page "/scatter"
+
+<PageTitle>Scatter &amp; Bubble</PageTitle>
+
+<div class="page-head">
+    <h1>Scatter &amp; Bubble</h1>
+    <p>Linear x/y axes with (x, y) points, and bubble charts where the radius encodes a third value.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Scatter</h3>
+        <p class="desc">two point clouds on a linear x axis</p>
+        <BlazorChart Type="BlazorChartType.Scatter" Data="@ScatterData()" Options="_bottom" />
+    </div>
+
+    <div class="card">
+        <h3>Bubble</h3>
+        <p class="desc">radius = magnitude</p>
+        <BlazorChart Type="BlazorChartType.Bubble" Data="@BubbleData()" Options="_bottom" />
+    </div>
+</div>
+
+@code {
+    private readonly BlazorChartOptions _bottom = new()
+    {
+        Plugins = new BlazorChartPluginOptions
+        {
+            Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom, Labels = new BlazorChartLegendLabelOptions { UsePointStyle = true } }
+        },
+        Scales =
+        {
+            ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Linear, Grace = 0.1 },
+            ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Grace = 0.1 }
+        }
+    };
+
+    private BlazorChartData ScatterData() => new()
+    {
+        Datasets =
+        {
+            new BlazorChartDataset
+            {
+                Label = "Group A", BackgroundColor = "#36a2eb",
+                Points = new()
+                {
+                    new(-8, 5), new(-5, 8), new(-3, 2), new(-1, 6), new(0, 9),
+                    new(2, 4), new(4, 11), new(6, 7), new(9, 13)
+                }
+            },
+            new BlazorChartDataset
+            {
+                Label = "Group B", BackgroundColor = "#ff6384", PointStyle = BlazorChartPointStyle.Triangle, PointRadius = 5,
+                Points = new()
+                {
+                    new(-7, -3), new(-4, -1), new(-2, -6), new(1, -2), new(3, -7),
+                    new(5, -1), new(7, -5), new(10, 0)
+                }
+            }
+        }
+    };
+
+    private BlazorChartData BubbleData() => new()
+    {
+        Datasets =
+        {
+            new BlazorChartDataset
+            {
+                Label = "Markets", BackgroundColor = ColorUtilAlpha("#4bc0c0"),
+                BorderColor = "#4bc0c0",
+                Points = new()
+                {
+                    new(10, 20, 14), new(15, 10, 8), new(20, 30, 22),
+                    new(25, 18, 10), new(30, 25, 30), new(35, 12, 6)
+                }
+            }
+        }
+    };
+
+    private static string ColorUtilAlpha(string c) => BlazorChartColorUtil.WithAlpha(c, 0.5);
+}

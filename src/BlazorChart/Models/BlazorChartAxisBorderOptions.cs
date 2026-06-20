@@ -1,0 +1,10 @@
+namespace BlazorChart.Models;
+
+/// <summary>Axis border line configuration, mirroring Chart.js <c>scale.border</c>.</summary>
+public sealed class BlazorChartAxisBorderOptions
+{
+    public bool Display { get; set; } = true;
+    public string Color { get; set; } = "rgba(0,0,0,0.25)";
+    public double Width { get; set; } = 1;
+    public List<double>? Dash { get; set; }
+}
