@@ -72,7 +72,7 @@
                         <BlazorChartSvgPrimitive Node="n" />
                     }
                 </g>
-                <g class="@DataGroupClass" @key="(_animKey, 1)" clip-path="@ClipRef">
+                <g class="@DataGroupClass" style="@DataGroupStyle" @key="(_animKey, 1)" clip-path="@ClipRef">
                     @for (int ei = 0; ei < _scene.Elements.Count; ei++)
                     {
                         var el = _scene.Elements[ei];

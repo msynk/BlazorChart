@@ -1,4 +1,5 @@
 @page "/playground"
+@rendermode InteractiveServer
 
 <PageTitle>Playground</PageTitle>
 
@@ -47,19 +48,14 @@
     private bool _stacked = false;
     private double _tension = 0.3;
 
+    private bool IsPointBased => _type is BlazorChartType.Scatter or BlazorChartType.Bubble;
+
     private BlazorChartConfig BuildConfig()
     {
-        var data = new BlazorChartData
-        {
-            Labels = SampleData.Months.ToList(),
-            Datasets =
-            {
-                new BlazorChartDataset { Label = "Alpha", Data = SampleData.V(65, 59, 80, 81, 56, 55, 72),
-                    Tension = _tension, Fill = _fill ? BlazorChartFillMode.Origin : BlazorChartFillMode.None },
-                new BlazorChartDataset { Label = "Beta", Data = SampleData.V(28, 48, 40, 60, 86, 92, 78),
-                    Tension = _tension, Fill = _fill ? BlazorChartFillMode.Origin : BlazorChartFillMode.None }
-            }
-        };
+        var data = IsPointBased ? BuildPointData() : BuildValueData();
+
+        // Scatter/bubble plot points against a numeric x axis; the other types share a category axis.
+        var xScaleType = IsPointBased ? BlazorChartScaleType.Linear : BlazorChartScaleType.Category;
 
         var options = new BlazorChartOptions
         {
@@ -69,11 +65,56 @@
             },
             Scales =
             {
-                ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Category, Stacked = _stacked },
+                ["x"] = new BlazorChartScaleOptions { Id = "x", Type = xScaleType, Stacked = _stacked },
                 ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Stacked = _stacked, BeginAtZero = true }
             }
         };
 
         return new BlazorChartConfig(_type, data, options);
+    }
+
+    private BlazorChartData BuildValueData() => new()
+    {
+        Labels = SampleData.Months.ToList(),
+        Datasets =
+        {
+            new BlazorChartDataset { Label = "Alpha", Data = SampleData.V(65, 59, 80, 81, 56, 55, 72),
+                Tension = _tension, Fill = _fill ? BlazorChartFillMode.Origin : BlazorChartFillMode.None },
+            new BlazorChartDataset { Label = "Beta", Data = SampleData.V(28, 48, 40, 60, 86, 92, 78),
+                Tension = _tension, Fill = _fill ? BlazorChartFillMode.Origin : BlazorChartFillMode.None }
+        }
+    };
+
+    private BlazorChartData BuildPointData()
+    {
+        bool bubble = _type is BlazorChartType.Bubble;
+        return new BlazorChartData
+        {
+            Datasets =
+            {
+                new BlazorChartDataset
+                {
+                    Label = "Alpha",
+                    Points = new()
+                    {
+                        new(10, 65, bubble ? 12 : null), new(20, 59, bubble ? 6 : null),
+                        new(30, 80, bubble ? 18 : null), new(45, 81, bubble ? 9 : null),
+                        new(55, 56, bubble ? 14 : null), new(70, 55, bubble ? 7 : null),
+                        new(85, 72, bubble ? 16 : null)
+                    }
+                },
+                new BlazorChartDataset
+                {
+                    Label = "Beta",
+                    Points = new()
+                    {
+                        new(15, 28, bubble ? 8 : null), new(25, 48, bubble ? 15 : null),
+                        new(35, 40, bubble ? 6 : null), new(50, 60, bubble ? 20 : null),
+                        new(60, 86, bubble ? 10 : null), new(75, 92, bubble ? 13 : null),
+                        new(90, 78, bubble ? 7 : null)
+                    }
+                }
+            }
+        };
     }
 }

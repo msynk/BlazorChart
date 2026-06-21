@@ -124,7 +124,9 @@ public sealed partial class BlazorChartRenderer
             }
             if (verts.Count == 0) continue;
 
-            scene.Background.Add(new BlazorChartSvgPolygon
+            // Add the web (line + filled surface) to the animated series layer so it grows in
+            // together with the joint points instead of staying fixed.
+            scene.Series.Add(new BlazorChartSvgPolygon
             {
                 Points = verts.Select(p => (p.x, p.y)).ToList(),
                 Fill = ds.Fill != BlazorChartFillMode.None ? fill : "none",

@@ -32,6 +32,10 @@ public sealed class BlazorChartScene
     public bool HasBars { get; set; }
     /// <summary>True when bars are horizontal (indexAxis = y).</summary>
     public bool HorizontalBars { get; set; }
+    /// <summary>The value-axis baseline pixel the bars grow from (y for vertical bars, x for
+    /// horizontal bars). Used as the transform-origin for the bar entry animation so they scale
+    /// out of the axis line rather than the edge of the SVG.</summary>
+    public double BarBaseline { get; set; }
 
     /// <summary>Effective value range per axis id after data/zoom resolution.</summary>
     public Dictionary<string, (double Min, double Max)> AxisRanges { get; } = new();

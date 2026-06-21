@@ -112,6 +112,7 @@ public sealed partial class BlazorChartRenderer
                     };
                     cx = slotCenter; cy = yTop;
                     originX = slotCenter; originY = yBase;   // grow from the baseline
+                    scene.BarBaseline = yBase;
                 }
                 else
                 {
@@ -128,6 +129,7 @@ public sealed partial class BlazorChartRenderer
                     };
                     cx = xTop; cy = slotCenter;
                     originX = xBase; originY = slotCenter;   // grow from the baseline
+                    scene.BarBaseline = xBase;
                 }
 
                 // Per-corner radius emits a rounded path instead of a plain rect.

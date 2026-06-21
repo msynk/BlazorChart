@@ -568,8 +568,32 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
         }
     }
 
-    /// <summary>Class for the series (line/area) group — animates with the same proven group mechanism.</summary>
-    private string SeriesGroupClass => CanAnimate ? "bc-series bc-animate bc-anim-rise" : "bc-series";
+    /// <summary>
+    /// Inline transform-origin for the data group's entry animation. For bars we pin the origin to the
+    /// value-axis baseline (in view-box pixels) so the group scales out of the axis line instead of the
+    /// bottom/left edge of the SVG. The animation itself stays on the keyed group, which is what makes
+    /// it replay reliably on both reload and SPA navigation.
+    /// </summary>
+    private string? DataGroupStyle
+    {
+        get
+        {
+            if (!CanAnimate || !_scene.HasBars) return null;
+            // scaleY uses only the y-origin (vertical bars); scaleX only the x-origin (horizontal bars).
+            return _scene.HorizontalBars
+                ? $"transform-origin:{BlazorChartSvg.N(_scene.BarBaseline)}px 0px"
+                : $"transform-origin:0px {BlazorChartSvg.N(_scene.BarBaseline)}px";
+        }
+    }
+
+    /// <summary>Class for the series (line/area) group — animates with the same proven group mechanism.
+    /// Radial/circular charts (e.g. radar) grow from the center so the web matches its joint points.</summary>
+    private string SeriesGroupClass =>
+        CanAnimate
+            ? _scene.IsRadialOrCircular
+                ? "bc-series bc-animate bc-anim-grow"
+                : "bc-series bc-animate bc-anim-rise"
+            : "bc-series";
 
     private string ElementClass(BlazorChartDataElement el)
     {
