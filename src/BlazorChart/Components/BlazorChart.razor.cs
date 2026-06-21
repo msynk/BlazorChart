@@ -532,6 +532,13 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
     private bool Staggered => CanAnimate && _config.Options.Animation.DelayBetween > 0 && !_scene.IsRadialOrCircular;
 
     /// <summary>
+    /// True when the line/area series should draw on progressively (stroke reveal left to right)
+    /// with points appearing in sequence. Driven by <see cref="BlazorChartAnimationOptions.Progressive"/>
+    /// and only set by the renderer for line/area charts.
+    /// </summary>
+    private bool ProgressiveDraw => CanAnimate && _scene.ProgressiveDraw;
+
+    /// <summary>
     /// Global (unscoped) animation rules emitted once per chart. Kept out of the component's
     /// isolated stylesheet so the rules reliably match the SVG shapes rendered by the child
     /// <c>SvgPrimitive</c> component (which carries a different CSS-isolation scope).
@@ -572,6 +579,9 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
         get
         {
             if (!CanAnimate) return "bc-data";
+            // Progressive draw: points reveal individually (per-element delay tied to x position),
+            // so the group itself carries no animation.
+            if (ProgressiveDraw) return "bc-data";
             // When staggering, the individual elements animate (with per-element delays) instead of
             // the whole group, so the group itself carries no animation.
             if (Staggered) return "bc-data";
@@ -607,16 +617,25 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
     /// Radial/circular charts (e.g. radar) grow from the center so the web matches its joint points.</summary>
     private string SeriesGroupClass =>
         CanAnimate
-            ? _scene.IsRadialOrCircular
-                ? "bc-series bc-animate bc-anim-grow"
-                : "bc-series bc-animate bc-anim-rise"
+            ? ProgressiveDraw
+                // The stroke draws itself on (bc-draw) and fills fade in, both at the path level,
+                // so the group must not also rise.
+                ? "bc-series"
+                : _scene.IsRadialOrCircular
+                    ? "bc-series bc-animate bc-anim-grow"
+                    : "bc-series bc-animate bc-anim-rise"
             : "bc-series";
 
     private string ElementClass(BlazorChartDataElement el)
     {
         string c = "bc-el";
         if (IsActive(el)) c += " bc-active";
-        if (Staggered)
+        if (ProgressiveDraw)
+        {
+            // Each point pops in as the drawing stroke reaches it (delay set in ElementStyle).
+            c += " bc-el-anim bc-el-rise";
+        }
+        else if (Staggered)
         {
             // Bars reuse the proven view-box scaling classes (with an explicit per-element pixel
             // transform-origin set in ElementStyle); points/markers rise in via the fill-box class.
@@ -629,6 +648,18 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
 
     private string ElementStyle(int index)
     {
+        if (ProgressiveDraw)
+        {
+            // Reveal each point in time with the stroke as it sweeps left to right. The delay is tied
+            // to the point's horizontal position within the plot area so points and line stay in sync.
+            double dur = _config.Options.Animation.Duration;
+            double elDur = Math.Min(250, dur * 0.4);
+            double frac = 0;
+            if (_scene.PlotArea is { Width: > 0 } pa)
+                frac = Math.Clamp((_scene.Elements[index].CenterX - pa.Left) / pa.Width, 0, 1);
+            double pDelay = frac * Math.Max(0, dur - elDur);
+            return $"cursor:pointer;animation-delay:{BlazorChartSvg.N(pDelay)}ms;animation-duration:{BlazorChartSvg.N(elDur)}ms";
+        }
         if (!Staggered) return "cursor:pointer";
         double delay = index * _config.Options.Animation.DelayBetween;
         string s = $"cursor:pointer;animation-delay:{BlazorChartSvg.N(delay)}ms";

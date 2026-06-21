@@ -282,7 +282,8 @@
     private RenderFragment RenderDataTable() => __builder =>
     {
         var data = _config.Data;
-        <table class="bc-sr-only">
+        <div class="bc-sr-only">
+        <table>
             <caption>@ChartAriaLabel</caption>
             @if (HasPointData)
             {
@@ -341,5 +342,6 @@
                 </tbody>
             }
         </table>
+        </div>
     };
 }

@@ -27,6 +27,7 @@
 @code {
     private readonly BlazorChartOptions _time = new()
     {
+        Animation = new BlazorChartAnimationOptions { Progressive = true, Duration = 1500 },
         Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
         Scales =
         {
@@ -37,6 +38,7 @@
 
     private readonly BlazorChartOptions _month = new()
     {
+        Animation = new BlazorChartAnimationOptions { Progressive = true, Duration = 1500 },
         Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
         Scales =
         {

@@ -266,6 +266,9 @@ public sealed partial class BlazorChartRenderer
         var xy = pts.Select(p => (p.x, p.y)).ToList();
         string d = BuildPath(xy, ds.Tension, ds.Stepped, ds.CubicInterpolationMode);
 
+        bool progressive = _options.Animation.Animate && _options.Animation.Progressive;
+        if (progressive) scene.ProgressiveDraw = true;
+
         if (ds.Fill != BlazorChartFillMode.None && ds.ShowLine)
         {
             string? fillD = null;
@@ -292,7 +295,7 @@ public sealed partial class BlazorChartRenderer
                 fillD = d + $" L {BlazorChartSvg.N(xy[^1].x)} {BlazorChartSvg.N(baseY)} L {BlazorChartSvg.N(xy[0].x)} {BlazorChartSvg.N(baseY)} Z";
             }
 
-            scene.Series.Add(new BlazorChartSvgPath { D = fillD, Fill = ResolveFill(scene, ds, border, plot), Stroke = null });
+            scene.Series.Add(new BlazorChartSvgPath { D = fillD, Fill = ResolveFill(scene, ds, border, plot), Stroke = null, AnimateFade = progressive });
         }
 
         if (ds.ShowLine)
@@ -314,17 +317,22 @@ public sealed partial class BlazorChartRenderer
                         D = $"M {BlazorChartSvg.N(a.x)} {BlazorChartSvg.N(a.y)} L {BlazorChartSvg.N(b.x)} {BlazorChartSvg.N(b.y)}",
                         Fill = "none", Stroke = color, StrokeWidth = width,
                         Dash = dash is null ? "" : BlazorChartSvg.Dash(dash),
-                        LineCap = ds.BorderCapStyle, LineJoin = ds.BorderJoinStyle
+                        LineCap = ds.BorderCapStyle, LineJoin = ds.BorderJoinStyle,
+                        AnimateFade = progressive
                     });
                 }
             }
             else
             {
+                bool dashed = ds.BorderDash is { Count: > 0 };
                 scene.Series.Add(new BlazorChartSvgPath
                 {
                     D = d, Fill = "none", Stroke = border,
                     StrokeWidth = ds.BorderWidth <= 1 ? _options.Elements.LineBorderWidth : ds.BorderWidth,
-                    Dash = BlazorChartSvg.Dash(ds.BorderDash), LineCap = ds.BorderCapStyle, LineJoin = ds.BorderJoinStyle
+                    Dash = BlazorChartSvg.Dash(ds.BorderDash), LineCap = ds.BorderCapStyle, LineJoin = ds.BorderJoinStyle,
+                    // Draw-on reveals the stroke left to right; dashed strokes can't (dasharray is in use), so they fade.
+                    AnimateDraw = progressive && !dashed,
+                    AnimateFade = progressive && dashed
                 });
             }
         }
@@ -407,17 +415,23 @@ public sealed partial class BlazorChartRenderer
                 string border = ResolveBorder(ds, i, 0, false);
                 var topXy = topPts.Select(p => (p.x, p.y)).ToList();
 
+                bool progressive = _options.Animation.Animate && _options.Animation.Progressive;
+                if (progressive) scene.ProgressiveDraw = true;
+                bool dashed = ds.BorderDash is { Count: > 0 };
+
                 if (ds.Fill != BlazorChartFillMode.None)
                 {
                     string fillD = AreaBetween(topXy, ds.Tension, ds.Stepped, basePts);
-                    scene.Series.Add(new BlazorChartSvgPath { D = fillD, Fill = ResolveFill(scene, ds, border, plot), Stroke = null });
+                    scene.Series.Add(new BlazorChartSvgPath { D = fillD, Fill = ResolveFill(scene, ds, border, plot), Stroke = null, AnimateFade = progressive });
                 }
 
                 scene.Series.Add(new BlazorChartSvgPath
                 {
                     D = BuildPath(topXy, ds.Tension, ds.Stepped), Fill = "none", Stroke = border,
                     StrokeWidth = ds.BorderWidth <= 1 ? _options.Elements.LineBorderWidth : ds.BorderWidth,
-                    Dash = BlazorChartSvg.Dash(ds.BorderDash), LineCap = ds.BorderCapStyle, LineJoin = ds.BorderJoinStyle
+                    Dash = BlazorChartSvg.Dash(ds.BorderDash), LineCap = ds.BorderCapStyle, LineJoin = ds.BorderJoinStyle,
+                    AnimateDraw = progressive && !dashed,
+                    AnimateFade = progressive && dashed
                 });
 
                 if (ds.PointRadius > 0)

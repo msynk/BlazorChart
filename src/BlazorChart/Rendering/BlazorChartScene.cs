@@ -32,6 +32,10 @@ public sealed class BlazorChartScene
     public bool HasBars { get; set; }
     /// <summary>True when bars are horizontal (indexAxis = y).</summary>
     public bool HorizontalBars { get; set; }
+    /// <summary>True when the line series should animate with a progressive draw-on (stroke reveal,
+    /// left to right) rather than the default group rise. Set by the renderer for line/area charts
+    /// when <see cref="BlazorChartAnimationOptions.Progressive"/> is enabled.</summary>
+    public bool ProgressiveDraw { get; set; }
     /// <summary>The value-axis baseline pixel the bars grow from (y for vertical bars, x for
     /// horizontal bars). Used as the transform-origin for the bar entry animation so they scale
     /// out of the axis line rather than the edge of the SVG.</summary>
