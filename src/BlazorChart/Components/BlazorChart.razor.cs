@@ -286,13 +286,19 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
         _initialized = true;
     }
 
-    /// <summary>A cheap signature of the data values driving the chart (changes when data changes).</summary>
+    /// <summary>A cheap signature of the data values driving the chart (changes when data changes).
+    /// Animation settings are folded in so that changing duration/easing/stagger replays the entry
+    /// animation, giving immediate visual feedback when those options are tweaked.</summary>
     private long ComputeSignature()
     {
         unchecked
         {
             long h = 17;
             h = h * 31 + (int)_config.Type;
+            var anim = _config.Options.Animation;
+            h = h * 31 + anim.Duration;
+            h = h * 31 + (anim.Easing?.GetHashCode() ?? 0);
+            h = h * 31 + BitConverter.DoubleToInt64Bits(anim.DelayBetween);
             foreach (var el in _scene.Elements)
             {
                 h = h * 31 + el.DatasetIndex;
@@ -520,6 +526,12 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
     private bool CanAnimate => AnimationEnabled;
 
     /// <summary>
+    /// True when a positive per-element delay is configured: each data element animates in sequence
+    /// rather than the whole data group animating as one unit. Not used for radial/circular charts.
+    /// </summary>
+    private bool Staggered => CanAnimate && _config.Options.Animation.DelayBetween > 0 && !_scene.IsRadialOrCircular;
+
+    /// <summary>
     /// Global (unscoped) animation rules emitted once per chart. Kept out of the component's
     /// isolated stylesheet so the rules reliably match the SVG shapes rendered by the child
     /// <c>SvgPrimitive</c> component (which carries a different CSS-isolation scope).
@@ -538,6 +550,8 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
         .bc-anim-grow { animation-name: bc-grow; transform-box: view-box; transform-origin: center; }
         .bc-anim-bars-v { animation-name: bc-scale-y; transform-box: view-box; transform-origin: center bottom; }
         .bc-anim-bars-h { animation-name: bc-scale-x; transform-box: view-box; transform-origin: left center; }
+        .bc-el-anim { animation-duration: var(--bc-dur, 600ms); animation-timing-function: var(--bc-ease, ease-out); animation-fill-mode: both; transform-box: fill-box; }
+        .bc-el-rise { animation-name: bc-rise; transform-origin: center bottom; }
         .bc-draw { animation: bc-draw var(--bc-dur, 600ms) var(--bc-ease, ease-out) both; stroke-dasharray: 1; }
         .bc-fade { animation: bc-fade var(--bc-dur, 600ms) var(--bc-ease, ease-out) both; }
         .bc-focus-ring { stroke-dasharray: 3 2; }
@@ -549,7 +563,7 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
                         cx var(--bc-dur,600ms) var(--bc-ease,ease-out), cy var(--bc-dur,600ms) var(--bc-ease,ease-out),
                         r var(--bc-dur,600ms) var(--bc-ease,ease-out), d var(--bc-dur,600ms) var(--bc-ease,ease-out), fill .3s ease;
         }
-        @media (prefers-reduced-motion: reduce) { .bc-animate, .bc-draw, .bc-fade { animation: none; } .bc-transition :is(rect, circle, path, polygon) { transition: none; } }
+        @media (prefers-reduced-motion: reduce) { .bc-animate, .bc-el-anim, .bc-draw, .bc-fade { animation: none; } .bc-transition :is(rect, circle, path, polygon) { transition: none; } }
         </style>
         """;
 
@@ -558,6 +572,9 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
         get
         {
             if (!CanAnimate) return "bc-data";
+            // When staggering, the individual elements animate (with per-element delays) instead of
+            // the whole group, so the group itself carries no animation.
+            if (Staggered) return "bc-data";
             if (_scene.IsRadialOrCircular)
                 return "bc-data bc-animate bc-anim-grow";
             // Bars grow from the baseline as a size change, in the correct direction for the orientation.
@@ -578,7 +595,7 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
     {
         get
         {
-            if (!CanAnimate || !_scene.HasBars) return null;
+            if (!CanAnimate || Staggered || !_scene.HasBars) return null;
             // scaleY uses only the y-origin (vertical bars); scaleX only the x-origin (horizontal bars).
             return _scene.HorizontalBars
                 ? $"transform-origin:{BlazorChartSvg.N(_scene.BarBaseline)}px 0px"
@@ -599,10 +616,33 @@ public partial class BlazorChart : ComponentBase, IAsyncDisposable
     {
         string c = "bc-el";
         if (IsActive(el)) c += " bc-active";
+        if (Staggered)
+        {
+            // Bars reuse the proven view-box scaling classes (with an explicit per-element pixel
+            // transform-origin set in ElementStyle); points/markers rise in via the fill-box class.
+            c += _scene.HasBars
+                ? _scene.HorizontalBars ? " bc-animate bc-anim-bars-h" : " bc-animate bc-anim-bars-v"
+                : " bc-el-anim bc-el-rise";
+        }
         return c;
     }
 
-    private string ElementStyle(int index) => "cursor:pointer";
+    private string ElementStyle(int index)
+    {
+        if (!Staggered) return "cursor:pointer";
+        double delay = index * _config.Options.Animation.DelayBetween;
+        string s = $"cursor:pointer;animation-delay:{BlazorChartSvg.N(delay)}ms";
+        if (_scene.HasBars)
+        {
+            // bc-anim-bars-* use transform-box: view-box, so the origin must be given in view-box
+            // pixels pinned to the value-axis baseline (matching the non-staggered group behaviour).
+            var el = _scene.Elements[index];
+            s += _scene.HorizontalBars
+                ? $";transform-origin:{BlazorChartSvg.N(_scene.BarBaseline)}px {BlazorChartSvg.N(el.CenterY)}px"
+                : $";transform-origin:{BlazorChartSvg.N(el.CenterX)}px {BlazorChartSvg.N(_scene.BarBaseline)}px";
+        }
+        return s;
+    }
 
     private string AnimStyle =>
         $"--bc-dur:{_config.Options.Animation.Duration}ms;--bc-ease:{_config.Options.Animation.Easing}";
