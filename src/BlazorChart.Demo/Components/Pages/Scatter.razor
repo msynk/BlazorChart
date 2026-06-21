@@ -12,16 +12,100 @@
         <h3>Scatter</h3>
         <p class="desc">two point clouds on a linear x axis</p>
         <BlazorChart Type="BlazorChartType.Scatter" Data="@ScatterData()" Options="_bottom" />
+        <CodeBlock Code="@ScatterSnippet" />
     </div>
 
     <div class="card">
         <h3>Bubble</h3>
         <p class="desc">radius = magnitude</p>
         <BlazorChart Type="BlazorChartType.Bubble" Data="@BubbleData()" Options="_bottom" />
+        <CodeBlock Code="@BubbleSnippet" />
     </div>
 </div>
 
 @code {
+    private const string ScatterSnippet = """
+        <BlazorChart Type="BlazorChartType.Scatter" Data="ScatterData()" Options="_bottom" />
+
+        @code {
+            private readonly BlazorChartOptions _bottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom, Labels = new BlazorChartLegendLabelOptions { UsePointStyle = true } }
+                },
+                Scales =
+                {
+                    ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Linear, Grace = 0.1 },
+                    ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Grace = 0.1 }
+                }
+            };
+
+            private BlazorChartData ScatterData() => new()
+            {
+                Datasets =
+                {
+                    new BlazorChartDataset
+                    {
+                        Label = "Group A", BackgroundColor = "#36a2eb",
+                        Points = new()
+                        {
+                            new(-8, 5), new(-5, 8), new(-3, 2), new(-1, 6), new(0, 9),
+                            new(2, 4), new(4, 11), new(6, 7), new(9, 13)
+                        }
+                    },
+                    new BlazorChartDataset
+                    {
+                        Label = "Group B", BackgroundColor = "#ff6384", PointStyle = BlazorChartPointStyle.Triangle, PointRadius = 5,
+                        Points = new()
+                        {
+                            new(-7, -3), new(-4, -1), new(-2, -6), new(1, -2), new(3, -7),
+                            new(5, -1), new(7, -5), new(10, 0)
+                        }
+                    }
+                }
+            };
+        }
+        """;
+
+    private const string BubbleSnippet = """
+        <BlazorChart Type="BlazorChartType.Bubble" Data="BubbleData()" Options="_bottom" />
+
+        @code {
+            private readonly BlazorChartOptions _bottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom, Labels = new BlazorChartLegendLabelOptions { UsePointStyle = true } }
+                },
+                Scales =
+                {
+                    ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Linear, Grace = 0.1 },
+                    ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Grace = 0.1 }
+                }
+            };
+
+            private BlazorChartData BubbleData() => new()
+            {
+                Datasets =
+                {
+                    new BlazorChartDataset
+                    {
+                        Label = "Markets",
+                        BackgroundColor = BlazorChartColorUtil.WithAlpha("#4bc0c0", 0.5),
+                        BorderColor = "#4bc0c0",
+                        // BlazorChartDataPoint(x, y, r) — r drives the bubble radius
+                        Points = new()
+                        {
+                            new(10, 20, 14), new(15, 10, 8), new(20, 30, 22),
+                            new(25, 18, 10), new(30, 25, 30), new(35, 12, 6)
+                        }
+                    }
+                }
+            };
+        }
+        """;
+
     private readonly BlazorChartOptions _bottom = new()
     {
         Plugins = new BlazorChartPluginOptions

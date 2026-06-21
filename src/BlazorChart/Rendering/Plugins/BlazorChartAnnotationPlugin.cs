@@ -57,6 +57,14 @@ public sealed class BlazorChartAnnotationPlugin : IBlazorChartPlugin
                 double x2 = a.XMax is { } xM ? X(xM, a.XIsIndex) : plot.Right;
                 double y1 = a.YMax is { } yM ? ctx.YForValue(yM, a.AxisId) : plot.Top;
                 double y2 = a.YMin is { } ym ? ctx.YForValue(ym, a.AxisId) : plot.Bottom;
+
+                // Clamp to the plot area so a box whose bounds fall outside the visible
+                // axis range (e.g. YMin below the axis minimum) doesn't spill past the chart.
+                x1 = Math.Clamp(x1, plot.Left, plot.Right);
+                x2 = Math.Clamp(x2, plot.Left, plot.Right);
+                y1 = Math.Clamp(y1, plot.Top, plot.Bottom);
+                y2 = Math.Clamp(y2, plot.Top, plot.Bottom);
+
                 add(new BlazorChartSvgRect
                 {
                     X = Math.Min(x1, x2), Y = Math.Min(y1, y2),

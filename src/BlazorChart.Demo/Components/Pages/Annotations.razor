@@ -16,16 +16,86 @@
         <h3>Threshold lines</h3>
         <p class="desc">horizontal target + warning band</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Series()" Options="@_lines" />
+        <CodeBlock Code="@LinesSnippet" />
     </div>
 
     <div class="card">
         <h3>Box + vertical marker</h3>
         <p class="desc">highlight a region and an event</p>
         <BlazorChart Type="BlazorChartType.Bar" Data="@Bars()" Options="@_box" />
+        <CodeBlock Code="@BoxSnippet" />
     </div>
 </div>
 
 @code {
+    private const string LinesSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Series()" Options="_lines" />
+
+        @code {
+            private BlazorChartOptions _lines = default!;
+
+            protected override void OnInitialized()
+            {
+                _lines = new BlazorChartOptions
+                {
+                    Plugins = new BlazorChartPluginOptions
+                    {
+                        Legend = new BlazorChartLegendOptions { Display = false },
+                        Custom =
+                        {
+                            new BlazorChartAnnotationPlugin(
+                                new BlazorChartAnnotation { Orientation = BlazorChartLineOrientation.Horizontal, Value = 80,
+                                    Color = "#2ecc71", Dash = new() { 6, 4 }, Label = "Target" },
+                                new BlazorChartAnnotation { Kind = BlazorChartAnnotationKind.Box, YMin = 0, YMax = 30,
+                                    Color = "#ff6384", FillColor = "rgba(255,99,132,0.10)", LineWidth = 0, Label = "Low", DrawBehindDatasets = true }
+                            )
+                        }
+                    }
+                };
+            }
+
+            private BlazorChartData Series() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets = { new BlazorChartDataset { Label = "Score", Data = new() { 20, 45, 60, 35, 75, 90, 70 }, BorderColor = "#36a2eb", Tension = 0.4 } }
+            };
+        }
+        """;
+
+    private const string BoxSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="Bars()" Options="_box" />
+
+        @code {
+            private BlazorChartOptions _box = default!;
+
+            protected override void OnInitialized()
+            {
+                _box = new BlazorChartOptions
+                {
+                    Plugins = new BlazorChartPluginOptions
+                    {
+                        Legend = new BlazorChartLegendOptions { Display = false },
+                        Custom =
+                        {
+                            new BlazorChartAnnotationPlugin(
+                                new BlazorChartAnnotation { Kind = BlazorChartAnnotationKind.Box, XIsIndex = true, XMin = 2, XMax = 4,
+                                    Color = "#9966ff", FillColor = "rgba(153,102,255,0.12)", LineWidth = 1, DrawBehindDatasets = true },
+                                new BlazorChartAnnotation { Orientation = BlazorChartLineOrientation.Vertical, XIsIndex = true, Value = 3,
+                                    Color = "#ff9f40", LineWidth = 2, Label = "Launch" }
+                            )
+                        }
+                    }
+                };
+            }
+
+            private BlazorChartData Bars() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets = { new BlazorChartDataset { Label = "Sales", Data = new() { 30, 42, 55, 70, 64, 48, 52 }, BackgroundColor = "#36a2eb" } }
+            };
+        }
+        """;
+
     private BlazorChartOptions _lines = default!;
     private BlazorChartOptions _box = default!;
 

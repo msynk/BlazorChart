@@ -12,22 +12,138 @@
         <h3>Rainfall + temperature</h3>
         <p class="desc">bars on left axis, line on right axis</p>
         <BlazorChart Data="SampleData.TempAndRainfall()" Options="@_combo" />
+        <CodeBlock Code="@ComboSnippet" />
     </div>
 
     <div class="card">
         <h3>Dual line axes</h3>
         <p class="desc">two metrics with very different ranges</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@DualLine()" Options="@_dual" />
+        <CodeBlock Code="@DualLineSnippet" />
     </div>
 
     <div class="card">
         <h3>Two x-axes</h3>
         <p class="desc">a second x-axis (top) with its own scale</p>
         <BlazorChart Type="BlazorChartType.Scatter" Data="@DualX()" Options="@_dualX" />
+        <CodeBlock Code="@DualXSnippet" />
     </div>
 </div>
 
 @code {
+    private const string ComboSnippet = """
+        @* No top-level Type: each dataset declares its own (Bar/Line). *@
+        <BlazorChart Data="TempAndRainfall()" Options="_combo" />
+
+        @code {
+            private readonly BlazorChartOptions _combo = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },
+                Scales =
+                {
+                    ["y"] = new BlazorChartScaleOptions
+                    {
+                        Id = "y", Type = BlazorChartScaleType.Linear, Position = BlazorChartPosition.Left, BeginAtZero = true,
+                        Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Rainfall (mm)" }
+                    },
+                    ["y2"] = new BlazorChartScaleOptions
+                    {
+                        Id = "y2", Type = BlazorChartScaleType.Linear, Position = BlazorChartPosition.Right, BeginAtZero = true,
+                        Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Temp (°C)" },
+                        Grid = new BlazorChartGridOptions { DrawOnChartArea = false },
+                        Ticks = new BlazorChartTickOptions { Suffix = "°" }
+                    }
+                }
+            };
+
+            private BlazorChartData TempAndRainfall() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Rainfall (mm)", Type = BlazorChartType.Bar, Data = new() { 60, 48, 80, 35, 55, 20, 15 },
+                        BackgroundColor = "rgba(54,162,235,0.5)", BorderColor = "#36a2eb", YAxisID = "y", Order = 1 },
+                    new BlazorChartDataset { Label = "Temp (°C)", Type = BlazorChartType.Line, Data = new() { 7, 9, 12, 16, 20, 24, 27 },
+                        BorderColor = "#ff6384", BackgroundColor = "#ff6384", Tension = 0.4, YAxisID = "y2", Order = 0 }
+                }
+            };
+        }
+        """;
+
+    private const string DualLineSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="DualLine()" Options="_dual" />
+
+        @code {
+            private readonly BlazorChartOptions _dual = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },
+                Scales =
+                {
+                    ["y"] = new BlazorChartScaleOptions
+                    {
+                        Id = "y", Type = BlazorChartScaleType.Linear, Position = BlazorChartPosition.Left,
+                        Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Users" }
+                    },
+                    ["y2"] = new BlazorChartScaleOptions
+                    {
+                        Id = "y2", Type = BlazorChartScaleType.Linear, Position = BlazorChartPosition.Right,
+                        Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Latency (ms)" },
+                        Grid = new BlazorChartGridOptions { DrawOnChartArea = false }
+                    }
+                }
+            };
+
+            private BlazorChartData DualLine() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Active users", Data = new() { 1200, 1900, 1700, 2400, 2200, 3000, 2800 },
+                        BorderColor = "#36a2eb", BackgroundColor = "#36a2eb", Tension = 0.4, YAxisID = "y" },
+                    new BlazorChartDataset { Label = "Latency", Data = new() { 120, 95, 110, 80, 90, 70, 65 },
+                        BorderColor = "#ff9f40", BackgroundColor = "#ff9f40", Tension = 0.4, YAxisID = "y2", BorderDash = new() { 5, 4 } }
+                }
+            };
+        }
+        """;
+
+    private const string DualXSnippet = """
+        <BlazorChart Type="BlazorChartType.Scatter" Data="DualX()" Options="_dualX" />
+
+        @code {
+            private readonly BlazorChartOptions _dualX = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom, Labels = new BlazorChartLegendLabelOptions { UsePointStyle = true } } },
+                Scales =
+                {
+                    ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Linear, Position = BlazorChartPosition.Bottom,
+                        Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Wavelength (nm)" } },
+                    ["x2"] = new BlazorChartScaleOptions { Id = "x2", Type = BlazorChartScaleType.Linear, Position = BlazorChartPosition.Top,
+                        Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Frequency (THz)" },
+                        Grid = new BlazorChartGridOptions { DrawOnChartArea = false } },
+                    ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Grace = 0.1 }
+                }
+            };
+
+            private BlazorChartData DualX() => new()
+            {
+                Datasets =
+                {
+                    new BlazorChartDataset
+                    {
+                        Label = "Visible", BackgroundColor = "#36a2eb", XAxisID = "x", PointRadius = 6,
+                        Points = new() { new(450, 20), new(520, 45), new(580, 60), new(640, 38), new(700, 25) }
+                    },
+                    new BlazorChartDataset
+                    {
+                        Label = "Frequency band", BackgroundColor = "#ff6384", XAxisID = "x2", PointStyle = BlazorChartPointStyle.Triangle, PointRadius = 6,
+                        Points = new() { new(430, 30), new(500, 55), new(600, 40), new(660, 50) }
+                    }
+                }
+            };
+        }
+        """;
+
     private readonly BlazorChartOptions _combo = new()
     {
         Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },

@@ -1,0 +1,13 @@
+@* Collapsible source snippet shown under a demo chart.
+   Pure HTML (details/summary) so it works in static server rendering with no JS. *@
+
+<details class="code-snippet">
+    <summary>View code</summary>
+    <pre><code>@Code.Trim('\n', '\r')</code></pre>
+</details>
+
+@code {
+    /// <summary>The C# / Razor source that reproduces the chart in the same card.</summary>
+    [Parameter, EditorRequired]
+    public string Code { get; set; } = string.Empty;
+}

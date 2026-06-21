@@ -15,27 +15,116 @@
     <h3>@(_count.ToString("N0")) points &mdash; decimated to @_samples</h3>
     <p class="desc">wheel = zoom X · drag = pan · double-click = reset</p>
     <BlazorChart Type="BlazorChartType.Line" Data="@_data" Options="@_options" />
+    <CodeBlock Code="@DecimationSnippet" />
 </div>
 
 <div class="card">
     <h3>Zoom both axes</h3>
     <p class="desc">Mode = XY on a scatter plot</p>
     <BlazorChart Type="BlazorChartType.Scatter" Data="@Scatter()" Options="@_xy" />
+    <CodeBlock Code="@XySnippet" />
 </div>
 
 <div class="card" style="margin-top:22px">
     <h3>Drag-to-zoom box</h3>
     <p class="desc">drag a rectangle to zoom into it · double-click to reset</p>
     <BlazorChart Type="BlazorChartType.Scatter" Data="@Scatter()" Options="@_drag" />
+    <CodeBlock Code="@DragSnippet" />
 </div>
 
 <div class="card" style="margin-top:22px">
     <h3>Category-axis zoom</h3>
     <p class="desc">scroll to zoom a 40-category bar chart · drag to pan</p>
     <BlazorChart Type="BlazorChartType.Bar" Data="@ManyBars()" Options="@_catZoom" />
+    <CodeBlock Code="@CatZoomSnippet" />
 </div>
 
 @code {
+    private const string DecimationSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="_data" Options="_options" />
+
+        @code {
+            private const int _count = 5000;
+            private const int _samples = 250;
+            private BlazorChartData _data = default!;
+
+            private readonly BlazorChartOptions _options = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Display = false },
+                    // LTTB downsampling keeps thousands of points smooth.
+                    Decimation = new BlazorChartDecimationOptions { Enabled = true, Samples = _samples, Threshold = 400 },
+                    Tooltip = new BlazorChartTooltipOptions { Enabled = false }
+                },
+                Zoom = new BlazorChartZoomOptions { Enabled = true, Mode = BlazorChartZoomMode.X },
+                Scales = { ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Time } }
+            };
+
+            // SampleData.LargeSeries(5000): 5000 noisy points at 10-minute spacing.
+            protected override void OnInitialized() => _data = SampleData.LargeSeries(_count);
+        }
+        """;
+
+    private const string XySnippet = """
+        <BlazorChart Type="BlazorChartType.Scatter" Data="Scatter()" Options="_xy" />
+
+        @code {
+            private readonly BlazorChartOptions _xy = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Zoom = new BlazorChartZoomOptions { Enabled = true, Mode = BlazorChartZoomMode.XY }
+            };
+
+            private BlazorChartData Scatter()
+            {
+                var rnd = new Random(3);
+                var pts = new List<BlazorChartDataPoint>();
+                for (int i = 0; i < 400; i++)
+                    pts.Add(new BlazorChartDataPoint(rnd.NextDouble() * 100 - 50, rnd.NextDouble() * 100 - 50));
+                return new BlazorChartData { Datasets = { new BlazorChartDataset { Label = "Cloud", BackgroundColor = "rgba(54,162,235,0.6)", Points = pts } } };
+            }
+        }
+        """;
+
+    private const string DragSnippet = """
+        <BlazorChart Type="BlazorChartType.Scatter" Data="Scatter()" Options="_drag" />
+
+        @code {
+            // DragZoom + Wheel = false: drag a rectangle to zoom into it.
+            private readonly BlazorChartOptions _drag = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Zoom = new BlazorChartZoomOptions { Enabled = true, Mode = BlazorChartZoomMode.XY, DragZoom = true, Wheel = false }
+            };
+            // Scatter(): 400-point random cloud (see "Zoom both axes" card)
+        }
+        """;
+
+    private const string CatZoomSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="ManyBars()" Options="_catZoom" />
+
+        @code {
+            private readonly BlazorChartOptions _catZoom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Zoom = new BlazorChartZoomOptions { Enabled = true, Mode = BlazorChartZoomMode.X }
+            };
+
+            private BlazorChartData ManyBars()
+            {
+                var rnd = new Random(11);
+                var labels = Enumerable.Range(1, 40).Select(i => $"D{i}").ToList();
+                var data = Enumerable.Range(0, 40).Select(_ => (double?)Math.Round(rnd.NextDouble() * 80 + 20, 0)).ToList();
+                return new BlazorChartData
+                {
+                    Labels = labels,
+                    Datasets = { new BlazorChartDataset { Label = "Daily", Data = data, BackgroundColor = "#4bc0c0" } }
+                };
+            }
+        }
+        """;
+
     private const int _count = 5000;
     private const int _samples = 250;
     private BlazorChartData _data = default!;

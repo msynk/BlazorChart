@@ -12,16 +12,69 @@
         <h3>Bar + line</h3>
         <p class="desc">line drawn on top of bars</p>
         <BlazorChart Type="BlazorChartType.Bar" Data="@BarLine()" Options="_bottom" />
+        <CodeBlock Code="@BarLineSnippet" />
     </div>
 
     <div class="card">
         <h3>Dual axis</h3>
         <p class="desc">revenue (left) vs. margin % (right)</p>
         <BlazorChart Type="BlazorChartType.Bar" Data="@DualAxis()" Options="@_dual" />
+        <CodeBlock Code="@DualAxisSnippet" />
     </div>
 </div>
 
 @code {
+    private const string BarLineSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="BarLine()" Options="_bottom" />
+
+        @code {
+            private readonly BlazorChartOptions _bottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            // Each dataset sets its own Type to mix bars and lines.
+            private BlazorChartData BarLine() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Type = BlazorChartType.Bar,  Label = "Units", Data = new() { 40, 55, 48, 70, 62, 80, 75 }, BackgroundColor = "#36a2eb" },
+                    new BlazorChartDataset { Type = BlazorChartType.Line, Label = "Trend", Data = new() { 38, 50, 52, 64, 68, 76, 80 }, BorderColor = "#ff6384", Tension = 0.4 }
+                }
+            };
+        }
+        """;
+
+    private const string DualAxisSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="DualAxis()" Options="_dual" />
+
+        @code {
+            private readonly BlazorChartOptions _dual = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },
+                Scales =
+                {
+                    ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Position = BlazorChartPosition.Left, BeginAtZero = true,
+                        Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Revenue ($k)" } },
+                    ["y2"] = new BlazorChartScaleOptions { Id = "y2", Type = BlazorChartScaleType.Linear, Position = BlazorChartPosition.Right, BeginAtZero = true,
+                        Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Margin %" },
+                        Grid = new BlazorChartGridOptions { DrawOnChartArea = false } }
+                }
+            };
+
+            private BlazorChartData DualAxis() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Type = BlazorChartType.Bar,  Label = "Revenue", YAxisID = "y",  Data = new() { 120, 150, 130, 180, 165, 210, 195 }, BackgroundColor = "#36a2eb" },
+                    new BlazorChartDataset { Type = BlazorChartType.Line, Label = "Margin",  YAxisID = "y2", Data = new() { 18, 22, 20, 26, 24, 30, 28 }, BorderColor = "#ff9f40", Tension = 0.3 }
+                }
+            };
+        }
+        """;
+
     private readonly BlazorChartOptions _bottom = new()
     {
         Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }

@@ -1,6 +1,6 @@
 @page "/"
 
-<PageTitle>BlazorChart — Overview</PageTitle>
+<PageTitle>BlazorChart ï¿½ Overview</PageTitle>
 
 <div class="page-head">
     <h1>BlazorChart</h1>
@@ -16,21 +16,25 @@
         <h3>Line</h3>
         <p class="desc">Smooth curves, multiple series, hover tooltips.</p>
         <BlazorChart Type="BlazorChartType.Line" Data="SampleData.MonthlySales()" Options="_basic" />
+        <CodeBlock Code="@LineSnippet" />
     </div>
     <div class="card">
         <h3>Bar</h3>
         <p class="desc">Grouped categories with a value axis.</p>
         <BlazorChart Type="BlazorChartType.Bar" Data="SampleData.Revenue()" Options="_basic" />
+        <CodeBlock Code="@BarSnippet" />
     </div>
     <div class="card">
         <h3>Doughnut</h3>
         <p class="desc">Proportional slices with a cutout center.</p>
         <BlazorChart Type="BlazorChartType.Doughnut" Data="SampleData.Traffic()" />
+        <CodeBlock Code="@DoughnutSnippet" />
     </div>
     <div class="card">
         <h3>Radar</h3>
         <p class="desc">Multi-axis comparison across categories.</p>
         <BlazorChart Type="BlazorChartType.Radar" Data="SampleData.Skills()" />
+        <CodeBlock Code="@RadarSnippet" />
     </div>
 </div>
 
@@ -39,4 +43,82 @@
     {
         Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
     };
+
+    private const string LineSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="GetData()" Options="_basic" />
+
+        @code {
+            private readonly BlazorChartOptions _basic = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData GetData() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "2025", Data = new() { 65, 59, 80, 81, 56, 55, 72 },
+                        BorderColor = "#36a2eb", BackgroundColor = "#36a2eb", Tension = 0.4, Fill = BlazorChartFillMode.None },
+                    new BlazorChartDataset { Label = "2026", Data = new() { 28, 48, 40, 60, 86, 92, 78 },
+                        BorderColor = "#ff6384", BackgroundColor = "#ff6384", Tension = 0.4, Fill = BlazorChartFillMode.None }
+                }
+            };
+        }
+        """;
+
+    private const string BarSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="GetData()" Options="_basic" />
+
+        @code {
+            private readonly BlazorChartOptions _basic = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData GetData() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Product A", Data = new() { 12, 19, 14, 22, 18, 25, 20 }, BackgroundColor = "#36a2eb" },
+                    new BlazorChartDataset { Label = "Product B", Data = new() { 8, 11, 17, 9, 14, 12, 19 }, BackgroundColor = "#ff9f40" },
+                    new BlazorChartDataset { Label = "Product C", Data = new() { 5, 7, 9, 12, 8, 10, 14 }, BackgroundColor = "#4bc0c0" }
+                }
+            };
+        }
+        """;
+
+    private const string DoughnutSnippet = """
+        <BlazorChart Type="BlazorChartType.Doughnut" Data="GetData()" />
+
+        @code {
+            private BlazorChartData GetData() => new()
+            {
+                Labels = { "Direct", "Organic", "Referral", "Social", "Email" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Sessions", Data = new() { 300, 500, 180, 240, 120 } }
+                }
+            };
+        }
+        """;
+
+    private const string RadarSnippet = """
+        <BlazorChart Type="BlazorChartType.Radar" Data="GetData()" />
+
+        @code {
+            private BlazorChartData GetData() => new()
+            {
+                Labels = { "Speed", "Power", "Range", "Defense", "Agility", "Stamina" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Player 1", Data = new() { 80, 65, 70, 60, 85, 75 },
+                        BorderColor = "#36a2eb", Fill = BlazorChartFillMode.Origin },
+                    new BlazorChartDataset { Label = "Player 2", Data = new() { 55, 80, 60, 90, 50, 65 },
+                        BorderColor = "#ff6384", Fill = BlazorChartFillMode.Origin }
+                }
+            };
+        }
+        """;
 }

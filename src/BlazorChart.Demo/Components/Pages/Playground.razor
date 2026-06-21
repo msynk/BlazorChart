@@ -38,9 +38,54 @@
 
 <div class="card">
     <BlazorChart Config="@BuildConfig()" />
+    <CodeBlock Code="@PlaygroundSnippet" />
 </div>
 
 @code {
+    private const string PlaygroundSnippet = """
+        @* One chart, rebuilt from control state via the Config parameter. *@
+        <BlazorChart Config="BuildConfig()" />
+
+        @code {
+            private BlazorChartType _type = BlazorChartType.Bar;
+            private BlazorChartPosition _legend = BlazorChartPosition.Top;
+            private bool _showLegend = true;
+            private bool _fill = false;
+            private bool _stacked = false;
+            private double _tension = 0.3;
+
+            private BlazorChartConfig BuildConfig()
+            {
+                var data = new BlazorChartData
+                {
+                    Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                    Datasets =
+                    {
+                        new BlazorChartDataset { Label = "Alpha", Data = new() { 65, 59, 80, 81, 56, 55, 72 },
+                            Tension = _tension, Fill = _fill ? BlazorChartFillMode.Origin : BlazorChartFillMode.None },
+                        new BlazorChartDataset { Label = "Beta", Data = new() { 28, 48, 40, 60, 86, 92, 78 },
+                            Tension = _tension, Fill = _fill ? BlazorChartFillMode.Origin : BlazorChartFillMode.None }
+                    }
+                };
+
+                var options = new BlazorChartOptions
+                {
+                    Plugins = new BlazorChartPluginOptions
+                    {
+                        Legend = new BlazorChartLegendOptions { Display = _showLegend, Position = _legend }
+                    },
+                    Scales =
+                    {
+                        ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Category, Stacked = _stacked },
+                        ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Stacked = _stacked, BeginAtZero = true }
+                    }
+                };
+
+                return new BlazorChartConfig(_type, data, options);
+            }
+        }
+        """;
+
     private BlazorChartType _type = BlazorChartType.Bar;
     private BlazorChartPosition _legend = BlazorChartPosition.Top;
     private bool _showLegend = true;

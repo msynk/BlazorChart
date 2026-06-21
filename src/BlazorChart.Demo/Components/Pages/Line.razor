@@ -12,46 +12,216 @@
         <h3>Smooth + area fill</h3>
         <p class="desc">tension 0.4, filled to origin</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Filled()" Options="_legendBottom" />
+        <CodeBlock Code="@FilledSnippet" />
     </div>
 
     <div class="card">
         <h3>Straight lines</h3>
         <p class="desc">tension 0, two series</p>
         <BlazorChart Type="BlazorChartType.Line" Data="SampleData.MonthlySales()" Options="_legendBottom" />
+        <CodeBlock Code="@StraightSnippet" />
     </div>
 
     <div class="card">
         <h3>Stepped</h3>
         <p class="desc">stepped: before</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Stepped()" Options="_legendBottom" />
+        <CodeBlock Code="@SteppedSnippet" />
     </div>
 
     <div class="card">
         <h3>Dashed + custom points</h3>
         <p class="desc">borderDash, star markers, spanGaps</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Dashed()" Options="_legendBottom" />
+        <CodeBlock Code="@DashedSnippet" />
     </div>
 
     <div class="card">
         <h3>Logarithmic Y axis</h3>
         <p class="desc">type: logarithmic</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Log()" Options="@_logOptions" />
+        <CodeBlock Code="@LogSnippet" />
     </div>
 
     <div class="card">
         <h3>Per-segment styling</h3>
         <p class="desc">up = green, down = red, projection dashed</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Segmented()" Options="_legendBottom" />
+        <CodeBlock Code="@SegmentedSnippet" />
     </div>
 
     <div class="card">
         <h3>Monotone smoothing</h3>
         <p class="desc">cubicInterpolationMode: monotone (no overshoot)</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Monotone()" Options="_legendBottom" />
+        <CodeBlock Code="@MonotoneSnippet" />
     </div>
 </div>
 
 @code {
+    private const string FilledSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Filled()" Options="_legendBottom" />
+
+        @code {
+            private readonly BlazorChartOptions _legendBottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData Filled() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Visitors", Data = new() { 120, 190, 160, 250, 220, 300, 280 },
+                        BorderColor = "#36a2eb", Tension = 0.4, Fill = BlazorChartFillMode.Origin }
+                }
+            };
+        }
+        """;
+
+    private const string StraightSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="MonthlySales()" Options="_legendBottom" />
+
+        @code {
+            private readonly BlazorChartOptions _legendBottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData MonthlySales() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "2025", Data = new() { 65, 59, 80, 81, 56, 55, 72 },
+                        BorderColor = "#36a2eb", BackgroundColor = "#36a2eb", Tension = 0.4, Fill = BlazorChartFillMode.None },
+                    new BlazorChartDataset { Label = "2026", Data = new() { 28, 48, 40, 60, 86, 92, 78 },
+                        BorderColor = "#ff6384", BackgroundColor = "#ff6384", Tension = 0.4, Fill = BlazorChartFillMode.None }
+                }
+            };
+        }
+        """;
+
+    private const string SteppedSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Stepped()" Options="_legendBottom" />
+
+        @code {
+            private readonly BlazorChartOptions _legendBottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData Stepped() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Plan", Data = new() { 10, 10, 25, 25, 40, 40, 55 },
+                        BorderColor = "#4bc0c0", Stepped = BlazorChartSteppedLine.Before }
+                }
+            };
+        }
+        """;
+
+    private const string DashedSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Dashed()" Options="_legendBottom" />
+
+        @code {
+            private readonly BlazorChartOptions _legendBottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData Dashed() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Forecast", Data = new() { 30, 42, null, 55, 48, 67, 70 },
+                        BorderColor = "#9966ff", BorderDash = new() { 6, 4 }, PointStyle = BlazorChartPointStyle.Star,
+                        PointRadius = 6, SpanGaps = true }
+                }
+            };
+        }
+        """;
+
+    private const string LogSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Log()" Options="_logOptions" />
+
+        @code {
+            private readonly BlazorChartOptions _logOptions = new()
+            {
+                Scales = { ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Logarithmic } }
+            };
+
+            private BlazorChartData Log() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Growth", Data = new() { 1, 10, 100, 1000, 5000, 20000, 80000 },
+                        BorderColor = "#ff6384", Tension = 0.2 }
+                }
+            };
+        }
+        """;
+
+    private const string SegmentedSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Segmented()" Options="_legendBottom" />
+
+        @code {
+            private readonly BlazorChartOptions _legendBottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData Segmented() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset
+                    {
+                        Label = "Flow",
+                        Data = new() { 40, 55, 48, 70, 62, 80, 72 },
+                        BorderColor = "#36a2eb",
+                        BorderWidth = 3,
+                        Segment = new BlazorChartLineSegmentStyle
+                        {
+                            BorderColor = ctx => ctx.EndValue < ctx.StartValue ? "#ff6384" : "#2ecc71",
+                            BorderDash = ctx => ctx.StartIndex >= 4 ? new double[] { 6, 4 } : null
+                        }
+                    }
+                }
+            };
+        }
+        """;
+
+    private const string MonotoneSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Monotone()" Options="_legendBottom" />
+
+        @code {
+            private readonly BlazorChartOptions _legendBottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData Monotone() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Cardinal (tension)", Data = new() { 10, 12, 60, 62, 30, 32, 70 },
+                        BorderColor = "#c9cbcf", Tension = 0.5, PointRadius = 3, PointBackgroundColor = "#c9cbcf" },
+                    new BlazorChartDataset { Label = "Monotone", Data = new() { 10, 12, 60, 62, 30, 32, 70 },
+                        BorderColor = "#36a2eb", CubicInterpolationMode = BlazorChartCubicInterpolationMode.Monotone,
+                        PointRadius = 3, PointBackgroundColor = "#36a2eb" }
+                }
+            };
+        }
+        """;
+
     private readonly BlazorChartOptions _legendBottom = new()
     {
         Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }

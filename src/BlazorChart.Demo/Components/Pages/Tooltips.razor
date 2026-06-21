@@ -12,34 +12,177 @@
         <h3>Title &amp; footer callbacks</h3>
         <p class="desc">hover a group: custom title + summed footer</p>
         <BlazorChart Type="BlazorChartType.Bar" Data="SampleData.Revenue()" Options="@_footer" />
+        <CodeBlock Code="@FooterSnippet" />
     </div>
 
     <div class="card">
         <h3>Currency labels</h3>
         <p class="desc">label callback formats each row as currency</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@TwoSeries()" Options="@_currency" />
+        <CodeBlock Code="@CurrencySnippet" />
     </div>
 
     <div class="card">
         <h3>After-body note</h3>
         <p class="desc">extra context appended below the values</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@TwoSeries()" Options="@_afterBody" />
+        <CodeBlock Code="@AfterBodySnippet" />
     </div>
 
     <div class="card">
         <h3>Styled box</h3>
         <p class="desc">light theme, border, centered text</p>
         <BlazorChart Type="BlazorChartType.Bar" Data="SampleData.Revenue()" Options="@_styled" />
+        <CodeBlock Code="@StyledSnippet" />
     </div>
 
     <div class="card">
         <h3>Point-style swatches</h3>
         <p class="desc">usePointStyle draws the marker in the tooltip</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Markers()" Options="@_pointStyle" />
+        <CodeBlock Code="@PointStyleSnippet" />
     </div>
 </div>
 
 @code {
+    private const string FooterSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="Revenue()" Options="_footer" />
+
+        @code {
+            private readonly BlazorChartOptions _footer = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom },
+                    Tooltip = new BlazorChartTooltipOptions
+                    {
+                        Mode = BlazorChartInteractionMode.Index,
+                        Callbacks = new BlazorChartTooltipCallbacks
+                        {
+                            Title = items => items.Count > 0 ? $"Month: {items[0].Label}" : null,
+                            Footer = items => $"Total: {items.Sum(i => i.Value):N0}"
+                        }
+                    }
+                }
+            };
+            // Revenue(): 3 datasets (Product A/B/C) over Jan..Jul
+        }
+        """;
+
+    private const string CurrencySnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="TwoSeries()" Options="_currency" />
+
+        @code {
+            private readonly BlazorChartOptions _currency = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom },
+                    Tooltip = new BlazorChartTooltipOptions
+                    {
+                        Mode = BlazorChartInteractionMode.Index,
+                        Callbacks = new BlazorChartTooltipCallbacks
+                        {
+                            Label = item => $"{item.DatasetLabel}: {item.Value:C0}"
+                        }
+                    }
+                }
+            };
+
+            private BlazorChartData TwoSeries() => new()
+            {
+                Labels = { "Q1", "Q2", "Q3", "Q4" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Revenue", Data = new() { 1200, 1500, 1700, 2100 }, BorderColor = "#36a2eb", BackgroundColor = "#36a2eb", Tension = 0.4 },
+                    new BlazorChartDataset { Label = "Costs",   Data = new() { 800, 950, 1100, 1300 }, BorderColor = "#ff6384", BackgroundColor = "#ff6384", Tension = 0.4 }
+                }
+            };
+        }
+        """;
+
+    private const string AfterBodySnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="TwoSeries()" Options="_afterBody" />
+
+        @code {
+            private readonly BlazorChartOptions _afterBody = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom },
+                    Tooltip = new BlazorChartTooltipOptions
+                    {
+                        Mode = BlazorChartInteractionMode.Index,
+                        Callbacks = new BlazorChartTooltipCallbacks
+                        {
+                            AfterBody = items =>
+                            {
+                                if (items.Count < 2) return null;
+                                double diff = items[0].Value - items[1].Value;
+                                return $"Margin: {diff:N0}";
+                            }
+                        }
+                    }
+                }
+            };
+            // TwoSeries(): Revenue & Costs over Q1..Q4
+        }
+        """;
+
+    private const string StyledSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="Revenue()" Options="_styled" />
+
+        @code {
+            private readonly BlazorChartOptions _styled = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom },
+                    Tooltip = new BlazorChartTooltipOptions
+                    {
+                        Mode = BlazorChartInteractionMode.Index,
+                        BackgroundColor = "#ffffff",
+                        TitleColor = "#1f2733",
+                        BodyColor = "#3a4452",
+                        FooterColor = "#1f2733",
+                        BorderColor = "#e0e4ea",
+                        BorderWidth = 1,
+                        TitleAlign = BlazorChartAlign.Center,
+                        Callbacks = new BlazorChartTooltipCallbacks { Footer = items => $"{items.Count} series" }
+                    }
+                }
+            };
+            // Revenue(): 3 datasets (Product A/B/C) over Jan..Jul
+        }
+        """;
+
+    private const string PointStyleSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Markers()" Options="_pointStyle" />
+
+        @code {
+            private readonly BlazorChartOptions _pointStyle = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom, Labels = new BlazorChartLegendLabelOptions { UsePointStyle = true } },
+                    Tooltip = new BlazorChartTooltipOptions { Mode = BlazorChartInteractionMode.Index, UsePointStyle = true }
+                }
+            };
+
+            private BlazorChartData Markers() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Triangles", Data = new() { 20, 35, 28, 45, 38, 52, 44 },
+                        BorderColor = "#4bc0c0", PointBackgroundColor = "#4bc0c0", PointStyle = BlazorChartPointStyle.Triangle, PointRadius = 5, Tension = 0.3 },
+                    new BlazorChartDataset { Label = "Diamonds", Data = new() { 12, 22, 18, 30, 26, 38, 32 },
+                        BorderColor = "#ff9f40", PointBackgroundColor = "#ff9f40", PointStyle = BlazorChartPointStyle.RectRot, PointRadius = 5, Tension = 0.3 }
+                }
+            };
+        }
+        """;
+
     private readonly BlazorChartOptions _footer = new()
     {
         Plugins = new BlazorChartPluginOptions

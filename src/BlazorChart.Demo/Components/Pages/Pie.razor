@@ -12,34 +12,133 @@
         <h3>Pie</h3>
         <p class="desc">click a legend label to hide a slice</p>
         <BlazorChart Type="BlazorChartType.Pie" Data="SampleData.Traffic()" Options="_right" />
+        <CodeBlock Code="@PieSnippet" />
     </div>
 
     <div class="card">
         <h3>Doughnut</h3>
         <p class="desc">cutout 60%</p>
         <BlazorChart Type="BlazorChartType.Doughnut" Data="SampleData.Traffic()" Options="@_doughnut" />
+        <CodeBlock Code="@DoughnutSnippet" />
     </div>
 
     <div class="card">
         <h3>Half doughnut (gauge)</h3>
         <p class="desc">circumference 180°, rotation -90°</p>
         <BlazorChart Type="BlazorChartType.Doughnut" Data="@Gauge()" Options="@_gauge" />
+        <CodeBlock Code="@GaugeSnippet" />
     </div>
 
     <div class="card">
         <h3>Multi-ring</h3>
         <p class="desc">two datasets as concentric rings</p>
         <BlazorChart Type="BlazorChartType.Doughnut" Data="@MultiRing()" Options="_right" />
+        <CodeBlock Code="@MultiRingSnippet" />
     </div>
 
     <div class="card">
         <h3>Center text (KPI)</h3>
         <p class="desc">BlazorChartCenterTextPlugin draws a total in the cutout</p>
         <BlazorChart Type="BlazorChartType.Doughnut" Data="SampleData.Traffic()" Options="@_centerText" />
+        <CodeBlock Code="@CenterTextSnippet" />
     </div>
 </div>
 
 @code {
+    private const string PieSnippet = """
+        <BlazorChart Type="BlazorChartType.Pie" Data="Traffic()" Options="_right" />
+
+        @code {
+            private readonly BlazorChartOptions _right = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Right } }
+            };
+
+            private BlazorChartData Traffic() => new()
+            {
+                Labels = { "Direct", "Organic", "Referral", "Social", "Email" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Sessions", Data = new() { 300, 500, 180, 240, 120 } }
+                }
+            };
+        }
+        """;
+
+    private const string DoughnutSnippet = """
+        <BlazorChart Type="BlazorChartType.Doughnut" Data="Traffic()" Options="_doughnut" />
+
+        @code {
+            private readonly BlazorChartOptions _doughnut = new()
+            {
+                CutoutPercentage = 60,
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Right } }
+            };
+            // Traffic(): Direct/Organic/Referral/Social/Email = 300/500/180/240/120
+        }
+        """;
+
+    private const string GaugeSnippet = """
+        <BlazorChart Type="BlazorChartType.Doughnut" Data="Gauge()" Options="_gauge" />
+
+        @code {
+            private readonly BlazorChartOptions _gauge = new()
+            {
+                CutoutPercentage = 65,
+                CircumferenceDegrees = 180,
+                RotationDegrees = -90,
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData Gauge() => new()
+            {
+                Labels = { "Used", "Free" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Data = new() { 68, 32 }, BackgroundColors = new() { "#ff6384", "#e6e9ef" } }
+                }
+            };
+        }
+        """;
+
+    private const string MultiRingSnippet = """
+        <BlazorChart Type="BlazorChartType.Doughnut" Data="MultiRing()" Options="_right" />
+
+        @code {
+            private readonly BlazorChartOptions _right = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Right } }
+            };
+
+            private BlazorChartData MultiRing() => new()
+            {
+                Labels = { "Mobile", "Desktop", "Tablet" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "2025", Data = new() { 55, 35, 10 } },
+                    new BlazorChartDataset { Label = "2026", Data = new() { 62, 28, 10 } }
+                }
+            };
+        }
+        """;
+
+    private const string CenterTextSnippet = """
+        <BlazorChart Type="BlazorChartType.Doughnut" Data="Traffic()" Options="_centerText" />
+
+        @code {
+            private readonly BlazorChartOptions _centerText = new()
+            {
+                CutoutPercentage = 68,
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Right },
+                    Custom = { new BlazorChartCenterTextPlugin("1,340", "sessions") }
+                }
+            };
+            // Traffic(): Direct/Organic/Referral/Social/Email = 300/500/180/240/120
+        }
+        """;
+
     private readonly BlazorChartOptions _right = new()
     {
         Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Right } }

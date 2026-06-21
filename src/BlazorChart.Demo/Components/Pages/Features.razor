@@ -12,18 +12,21 @@
         <h3>Title, subtitle &amp; axis titles</h3>
         <p class="desc">currency tick formatting via callback</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Revenue()" Options="@_titled" />
+        <CodeBlock Code="@TitledSnippet" />
     </div>
 
     <div class="card">
         <h3>Data labels</h3>
         <p class="desc">values drawn above each bar</p>
         <BlazorChart Type="BlazorChartType.Bar" Data="@Simple()" Options="@_dataLabels" />
+        <CodeBlock Code="@DataLabelsSnippet" />
     </div>
 
     <div class="card">
         <h3>Custom grid &amp; ticks</h3>
         <p class="desc">dashed grid, stepSize, suffix</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Simple()" Options="@_grid" />
+        <CodeBlock Code="@GridSnippet" />
     </div>
 
     <div class="card">
@@ -31,6 +34,7 @@
         <p class="desc">click any bar</p>
         <BlazorChart Type="BlazorChartType.Bar" Data="@Simple()" OnElementClick="OnClick" />
         <div class="click-log">@_log</div>
+        <CodeBlock Code="@ClickSnippet" />
     </div>
 
     <div class="card">
@@ -49,16 +53,169 @@
                 }
             </TooltipTemplate>
         </BlazorChart>
+        <CodeBlock Code="@TooltipTemplateSnippet" />
     </div>
 
     <div class="card">
         <h3>Multi-line &amp; bottom title</h3>
         <p class="desc">title with a line break, positioned below</p>
         <BlazorChart Type="BlazorChartType.Bar" Data="@Simple()" Options="@_bottomTitle" />
+        <CodeBlock Code="@BottomTitleSnippet" />
     </div>
 </div>
 
 @code {
+    private const string TitledSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Revenue()" Options="_titled" />
+
+        @code {
+            private readonly BlazorChartOptions _titled = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Title = new BlazorChartTitleOptions { Display = true, Text = "Quarterly Revenue" },
+                    Subtitle = new BlazorChartTitleOptions { Display = true, Text = "in thousands of USD" },
+                    Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom },
+                    Tooltip = new BlazorChartTooltipOptions { LabelFormatter = (label, v) => $"{label}: ${v:N0}k" }
+                },
+                Scales =
+                {
+                    ["y"] = new BlazorChartScaleOptions
+                    {
+                        Id = "y", Type = BlazorChartScaleType.Linear, BeginAtZero = true,
+                        Title = new BlazorChartScaleTitleOptions { Display = true, Text = "Revenue" },
+                        Ticks = new BlazorChartTickOptions { Prefix = "$", Suffix = "k" }
+                    }
+                }
+            };
+
+            private BlazorChartData Revenue() => new()
+            {
+                Labels = { "Q1", "Q2", "Q3", "Q4" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "2026", Data = new() { 120, 150, 170, 210 },
+                        BorderColor = "#36a2eb", Tension = 0.4, Fill = BlazorChartFillMode.Origin }
+                }
+            };
+        }
+        """;
+
+    private const string DataLabelsSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="Simple()" Options="_dataLabels" />
+
+        @code {
+            private readonly BlazorChartOptions _dataLabels = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Display = false },
+                    DataLabels = new BlazorChartDataLabelOptions { Display = true, Color = "#333" }
+                }
+            };
+
+            private BlazorChartData Simple() => new()
+            {
+                Labels = { "Mon", "Tue", "Wed", "Thu", "Fri" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Load", Data = new() { 40, 65, 50, 80, 60 },
+                        BackgroundColors = new() { "#36a2eb", "#ff6384", "#4bc0c0", "#ff9f40", "#9966ff" },
+                        BorderColor = "#36a2eb", Tension = 0.4 }
+                }
+            };
+        }
+        """;
+
+    private const string GridSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Simple()" Options="_grid" />
+
+        @code {
+            private readonly BlazorChartOptions _grid = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Scales =
+                {
+                    ["y"] = new BlazorChartScaleOptions
+                    {
+                        Id = "y", Type = BlazorChartScaleType.Linear, BeginAtZero = true,
+                        Ticks = new BlazorChartTickOptions { StepSize = 20, Suffix = "%" },
+                        Grid = new BlazorChartGridOptions { BorderDash = new() { 4, 4 }, Color = "rgba(54,162,235,0.18)" }
+                    }
+                }
+            };
+            // Simple(): Mon..Fri = 40/65/50/80/60
+        }
+        """;
+
+    private const string ClickSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="Simple()" OnElementClick="OnClick" />
+        <div class="click-log">@_log</div>
+
+        @code {
+            private string _log = "No element clicked yet.";
+
+            private void OnClick((int DatasetIndex, int DataIndex) e)
+                => _log = $"Clicked dataset {e.DatasetIndex}, index {e.DataIndex}.";
+
+            // Simple(): Mon..Fri = 40/65/50/80/60 (per-bar colors)
+        }
+        """;
+
+    private const string TooltipTemplateSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="TwoSeries()" Options="_indexTooltip">
+            <TooltipTemplate Context="ctx">
+                <div style="font-weight:600;margin-bottom:4px">@ctx.Title</div>
+                @foreach (var p in ctx.Points)
+                {
+                    <div style="display:flex;align-items:center;gap:6px">
+                        <span style="width:10px;height:10px;border-radius:50%;background:@p.Color;display:inline-block"></span>
+                        <span>@p.Label</span>
+                        <strong style="margin-left:auto">@p.Value.ToString("C0")</strong>
+                    </div>
+                }
+            </TooltipTemplate>
+        </BlazorChart>
+
+        @code {
+            private readonly BlazorChartOptions _indexTooltip = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom },
+                    Tooltip = new BlazorChartTooltipOptions { Mode = BlazorChartInteractionMode.Index, Position = BlazorChartTooltipPositioner.Average }
+                }
+            };
+
+            private BlazorChartData TwoSeries() => new()
+            {
+                Labels = { "Q1", "Q2", "Q3", "Q4" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Revenue", Data = new() { 1200, 1500, 1700, 2100 }, BorderColor = "#36a2eb", Tension = 0.4 },
+                    new BlazorChartDataset { Label = "Costs",   Data = new() { 800, 950, 1100, 1300 }, BorderColor = "#ff6384", Tension = 0.4 }
+                }
+            };
+        }
+        """;
+
+    private const string BottomTitleSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="Simple()" Options="_bottomTitle" />
+
+        @code {
+            private readonly BlazorChartOptions _bottomTitle = new()
+            {
+                Plugins = new BlazorChartPluginOptions
+                {
+                    Legend = new BlazorChartLegendOptions { Display = false },
+                    // "\n" inserts a line break in the title
+                    Title = new BlazorChartTitleOptions { Display = true, Text = "Weekly Load\n(arbitrary units)", Position = BlazorChartPosition.Bottom }
+                }
+            };
+            // Simple(): Mon..Fri = 40/65/50/80/60
+        }
+        """;
+
     private string _log = "No element clicked yet.";
 
     private void OnClick((int DatasetIndex, int DataIndex) e)

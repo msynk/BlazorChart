@@ -170,3 +170,56 @@ html, body {
 
 .btn:hover { background: #2b8fd6; border-color: #2b8fd6; }
 .controls input[type=range] { vertical-align: middle; }
+
+/* ---- code snippet (View code) ---- */
+.code-snippet {
+    margin-top: 14px;
+    border: 1px solid #e6e9ef;
+    border-radius: 10px;
+    background: #0f172a;
+    overflow: hidden;
+}
+
+.code-snippet > summary {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: #93c5fd;
+    background: #11131a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.code-snippet > summary::-webkit-details-marker { display: none; }
+
+.code-snippet > summary::before {
+    content: "▶";
+    font-size: 10px;
+    transition: transform .15s ease;
+}
+
+.code-snippet[open] > summary::before { transform: rotate(90deg); }
+
+.code-snippet > summary:hover { color: #bfdbfe; }
+
+.code-snippet pre {
+    margin: 0;
+    padding: 14px 16px;
+    overflow-x: auto;
+    background: #0f172a;
+}
+
+.code-snippet code {
+    font-family: "Cascadia Code", "Consolas", "SFMono-Regular", Menlo, monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: #e2e8f0;
+    white-space: pre;
+    tab-size: 4;
+}

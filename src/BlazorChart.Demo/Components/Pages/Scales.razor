@@ -12,40 +12,144 @@
         <h3>Fixed min / max</h3>
         <p class="desc">y locked to 0–100</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Series()" Options="@_minMax" />
+        <CodeBlock Code="@MinMaxSnippet" />
     </div>
 
     <div class="card">
         <h3>Suggested min / max</h3>
         <p class="desc">hints that expand (not clamp) the range</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Series()" Options="@_suggested" />
+        <CodeBlock Code="@SuggestedSnippet" />
     </div>
 
     <div class="card">
         <h3>Explicit step size</h3>
         <p class="desc">ticks every 25 units</p>
         <BlazorChart Type="BlazorChartType.Bar" Data="@Series()" Options="@_step" />
+        <CodeBlock Code="@StepSnippet" />
     </div>
 
     <div class="card">
         <h3>Logarithmic</h3>
         <p class="desc">decade ticks + minor gridlines</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@LogData()" Options="@_log" />
+        <CodeBlock Code="@LogSnippet" />
     </div>
 
     <div class="card">
         <h3>Reversed Y axis</h3>
         <p class="desc">rankings: lower is better</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Rank()" Options="@_reverse" />
+        <CodeBlock Code="@ReverseSnippet" />
     </div>
 
     <div class="card">
         <h3>Grace (padding)</h3>
         <p class="desc">10% headroom above & below the data</p>
         <BlazorChart Type="BlazorChartType.Line" Data="@Series()" Options="@_grace" />
+        <CodeBlock Code="@GraceSnippet" />
     </div>
 </div>
 
 @code {
+    private const string MinMaxSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Series()" Options="_minMax" />
+
+        @code {
+            private readonly BlazorChartOptions _minMax = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Scales = { ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Min = 0, Max = 100 } }
+            };
+
+            private BlazorChartData Series() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets = { new BlazorChartDataset { Label = "Value", Data = new() { 35, 52, 48, 70, 60, 78, 66 },
+                    BorderColor = "#36a2eb", BackgroundColor = "#36a2eb", Tension = 0.3 } }
+            };
+        }
+        """;
+
+    private const string SuggestedSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Series()" Options="_suggested" />
+
+        @code {
+            // SuggestedMin/Max only expand the range; data outside still shows.
+            private readonly BlazorChartOptions _suggested = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Scales = { ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, SuggestedMin = 0, SuggestedMax = 100 } }
+            };
+            // Series(): Jan..Jul = 35/52/48/70/60/78/66
+        }
+        """;
+
+    private const string StepSnippet = """
+        <BlazorChart Type="BlazorChartType.Bar" Data="Series()" Options="_step" />
+
+        @code {
+            private readonly BlazorChartOptions _step = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Scales = { ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, BeginAtZero = true,
+                    Ticks = new BlazorChartTickOptions { StepSize = 25 } } }
+            };
+            // Series(): Jan..Jul = 35/52/48/70/60/78/66
+        }
+        """;
+
+    private const string LogSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="LogData()" Options="_log" />
+
+        @code {
+            private readonly BlazorChartOptions _log = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Scales = { ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Logarithmic } }
+            };
+
+            private BlazorChartData LogData() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets = { new BlazorChartDataset { Label = "Growth", Data = new() { 1, 10, 100, 1000, 5000, 20000, 80000 },
+                    BorderColor = "#ff6384", BackgroundColor = "#ff6384", Tension = 0.2 } }
+            };
+        }
+        """;
+
+    private const string ReverseSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Rank()" Options="_reverse" />
+
+        @code {
+            private readonly BlazorChartOptions _reverse = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Scales = { ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Reverse = true, Min = 1, Max = 10 } }
+            };
+
+            private BlazorChartData Rank() => new()
+            {
+                Labels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" },
+                Datasets = { new BlazorChartDataset { Label = "Rank", Data = new() { 8, 6, 7, 3, 4, 2, 1 },
+                    BorderColor = "#9966ff", BackgroundColor = "#9966ff", Tension = 0.3 } }
+            };
+        }
+        """;
+
+    private const string GraceSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="Series()" Options="_grace" />
+
+        @code {
+            private readonly BlazorChartOptions _grace = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Scales = { ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear, Grace = 0.1 } }
+            };
+            // Series(): Jan..Jul = 35/52/48/70/60/78/66
+        }
+        """;
+
     private readonly BlazorChartOptions _minMax = new()
     {
         Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },

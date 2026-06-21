@@ -15,16 +15,76 @@
         <h3>Daily series (auto unit)</h3>
         <p class="desc">60 days &rarr; weekly ticks</p>
         <BlazorChart Type="BlazorChartType.Line" Data="SampleData.TimeSeries()" Options="@_time" />
+        <CodeBlock Code="@TimeSnippet" />
     </div>
 
     <div class="card">
         <h3>Forced month unit + custom format</h3>
         <p class="desc">BlazorChartTimeUnit.Month, custom formatter</p>
         <BlazorChart Type="BlazorChartType.Line" Data="SampleData.TimeSeries()" Options="@_month" />
+        <CodeBlock Code="@MonthSnippet" />
     </div>
 </div>
 
 @code {
+    private const string TimeSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="TimeSeries()" Options="_time" />
+
+        @code {
+            private readonly BlazorChartOptions _time = new()
+            {
+                Animation = new BlazorChartAnimationOptions { Progressive = true, Duration = 1500 },
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Scales =
+                {
+                    // A Time scale auto-selects the unit (hour/day/week/month/year) for the range.
+                    ["x"] = new BlazorChartScaleOptions { Id = "x", Type = BlazorChartScaleType.Time },
+                    ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear }
+                }
+            };
+
+            // Points carry x as a date (OADate). e.g. 60 daily points:
+            private BlazorChartData TimeSeries()
+            {
+                var start = new DateTime(2026, 1, 1);
+                var rnd = new Random(7);
+                var pts = new List<BlazorChartDataPoint>();
+                double v = 100;
+                for (int i = 0; i < 60; i++)
+                {
+                    v += rnd.NextDouble() * 20 - 9;
+                    pts.Add(new BlazorChartDataPoint(start.AddDays(i).ToOADate(), Math.Round(v, 1)));
+                }
+                return new BlazorChartData
+                {
+                    Datasets = { new BlazorChartDataset { Label = "Price", BorderColor = "#36a2eb", Tension = 0.3, Points = pts, PointRadius = 0 } }
+                };
+            }
+        }
+        """;
+
+    private const string MonthSnippet = """
+        <BlazorChart Type="BlazorChartType.Line" Data="TimeSeries()" Options="_month" />
+
+        @code {
+            private readonly BlazorChartOptions _month = new()
+            {
+                Animation = new BlazorChartAnimationOptions { Progressive = true, Duration = 1500 },
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } },
+                Scales =
+                {
+                    ["x"] = new BlazorChartScaleOptions
+                    {
+                        Id = "x", Type = BlazorChartScaleType.Time, TimeUnit = BlazorChartTimeUnit.Week,
+                        TimeFormat = d => d.ToString("d MMM")   // custom tick label
+                    },
+                    ["y"] = new BlazorChartScaleOptions { Id = "y", Type = BlazorChartScaleType.Linear }
+                }
+            };
+            // TimeSeries(): 60 daily points starting 2026-01-01 (see previous card)
+        }
+        """;
+
     private readonly BlazorChartOptions _time = new()
     {
         Animation = new BlazorChartAnimationOptions { Progressive = true, Duration = 1500 },

@@ -12,28 +12,122 @@
         <h3>Two players</h3>
         <p class="desc">filled areas</p>
         <BlazorChart Type="BlazorChartType.Radar" Data="SampleData.Skills()" Options="_bottom" />
+        <CodeBlock Code="@TwoPlayersSnippet" />
     </div>
 
     <div class="card">
         <h3>Outline only</h3>
         <p class="desc">no fill, thicker borders</p>
         <BlazorChart Type="BlazorChartType.Radar" Data="@Outline()" Options="_bottom" />
+        <CodeBlock Code="@OutlineSnippet" />
     </div>
 
     <div class="card">
         <h3>Circular grid</h3>
         <p class="desc">grid.circular + styled point labels &amp; backdrop</p>
         <BlazorChart Type="BlazorChartType.Radar" Data="SampleData.Skills()" Options="@_circular" />
+        <CodeBlock Code="@CircularSnippet" />
     </div>
 
     <div class="card">
         <h3>Skipped points</h3>
         <p class="desc">null values are skipped, not zeroed</p>
         <BlazorChart Type="BlazorChartType.Radar" Data="@Skip()" Options="_bottom" />
+        <CodeBlock Code="@SkipSnippet" />
     </div>
 </div>
 
 @code {
+    private const string TwoPlayersSnippet = """
+        <BlazorChart Type="BlazorChartType.Radar" Data="Skills()" Options="_bottom" />
+
+        @code {
+            private readonly BlazorChartOptions _bottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData Skills() => new()
+            {
+                Labels = { "Speed", "Power", "Range", "Defense", "Agility", "Stamina" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Player 1", Data = new() { 80, 65, 70, 60, 85, 75 },
+                        BorderColor = "#36a2eb", Fill = BlazorChartFillMode.Origin },
+                    new BlazorChartDataset { Label = "Player 2", Data = new() { 55, 80, 60, 90, 50, 65 },
+                        BorderColor = "#ff6384", Fill = BlazorChartFillMode.Origin }
+                }
+            };
+        }
+        """;
+
+    private const string OutlineSnippet = """
+        <BlazorChart Type="BlazorChartType.Radar" Data="Outline()" Options="_bottom" />
+
+        @code {
+            private readonly BlazorChartOptions _bottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            private BlazorChartData Outline() => new()
+            {
+                Labels = { "HTML", "CSS", "JS", "C#", "SQL", "DevOps" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Team A", Data = new() { 90, 75, 80, 95, 60, 70 }, BorderColor = "#36a2eb",
+                        Fill = BlazorChartFillMode.None, BorderWidth = 2 },
+                    new BlazorChartDataset { Label = "Team B", Data = new() { 70, 85, 65, 60, 90, 80 }, BorderColor = "#ff9f40",
+                        Fill = BlazorChartFillMode.None, BorderWidth = 2 }
+                }
+            };
+        }
+        """;
+
+    private const string CircularSnippet = """
+        <BlazorChart Type="BlazorChartType.Radar" Data="Skills()" Options="_circular" />
+
+        @code {
+            private readonly BlazorChartOptions _circular = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } },
+                Scales =
+                {
+                    ["r"] = new BlazorChartScaleOptions
+                    {
+                        Id = "r", Type = BlazorChartScaleType.RadialLinear, BeginAtZero = true,
+                        Grid = new BlazorChartGridOptions { Circular = true },
+                        AngleLineColor = "rgba(0,0,0,0.15)",
+                        PointLabels = new BlazorChartPointLabelOptions { Color = "#36a2eb", Font = new BlazorChartFont { Size = 12, Weight = "bold" } }
+                    }
+                }
+            };
+            // Skills(): Speed/Power/Range/Defense/Agility/Stamina for Player 1 & 2
+        }
+        """;
+
+    private const string SkipSnippet = """
+        <BlazorChart Type="BlazorChartType.Radar" Data="Skip()" Options="_bottom" />
+
+        @code {
+            private readonly BlazorChartOptions _bottom = new()
+            {
+                Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
+            };
+
+            // null values are skipped, not treated as zero
+            private BlazorChartData Skip() => new()
+            {
+                Labels = { "Speed", "Power", "Range", "Defense", "Agility", "Stamina" },
+                Datasets =
+                {
+                    new BlazorChartDataset { Label = "Scouted", Data = new() { 80, 65, null, 60, 85, null },
+                        BorderColor = "#9966ff", Fill = BlazorChartFillMode.Origin }
+                }
+            };
+        }
+        """;
+
     private readonly BlazorChartOptions _bottom = new()
     {
         Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Position = BlazorChartPosition.Bottom } }
