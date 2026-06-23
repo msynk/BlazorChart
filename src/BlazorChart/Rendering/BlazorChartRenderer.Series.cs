@@ -136,21 +136,36 @@ public sealed partial class BlazorChartRenderer
                 BlazorChartSvgNode shapeNode = rect;
                 bool perCorner = ds.BorderRadiusCorners is { } c0 &&
                     (c0.TopLeft > 0 || c0.TopRight > 0 || c0.BottomRight > 0 || c0.BottomLeft > 0);
+
+                // Effective corner radii (explicit per-corner, else uniform BorderRadius) used so the
+                // border follows the same rounded outline as the fill.
+                BlazorChartBorderRadiusCorners? roundedCorners = null;
+                if (perCorner) roundedCorners = ds.BorderRadiusCorners!.Value;
+                else if (ds.BorderRadius > 0) roundedCorners = ds.BorderRadius; // implicit double -> all corners
+
+                var skip = ResolveSkip(isRange ? BlazorChartBorderSkipped.None : ds.BorderSkipped, IsVertical, signFinal);
+
                 if (perCorner)
                     shapeNode = new BlazorChartSvgPath
                     {
                         D = RoundedRectPath(rect.X, rect.Y, rect.Width, rect.Height, ds.BorderRadiusCorners!.Value),
-                        Fill = bg,
-                        Stroke = ds.BorderWidth > 0 ? border : null,
-                        StrokeWidth = ds.BorderWidth
+                        Fill = bg
                     };
 
-                // Border honoring borderSkipped (uniform rects only; per-corner paths carry their own stroke).
+                // Border honoring borderSkipped. Rounded bars get a matching rounded border path so the
+                // stroke follows the corner radius instead of cutting square corners.
                 BlazorChartSvgNode? borderNode = null;
-                if (!perCorner && ds.BorderWidth > 0)
+                if (ds.BorderWidth > 0)
                 {
-                    var skip = ResolveSkip(isRange ? BlazorChartBorderSkipped.None : ds.BorderSkipped, IsVertical, signFinal);
-                    if (skip == BlazorChartBorderSkipped.None)
+                    if (roundedCorners is { } rc)
+                    {
+                        borderNode = new BlazorChartSvgPath
+                        {
+                            D = RoundedBarBorderPath(rect.X, rect.Y, rect.Width, rect.Height, rc, skip),
+                            Fill = "none", Stroke = border, StrokeWidth = ds.BorderWidth
+                        };
+                    }
+                    else if (skip == BlazorChartBorderSkipped.None)
                     {
                         rect.Stroke = border;
                         rect.StrokeWidth = ds.BorderWidth;
@@ -220,6 +235,70 @@ public sealed partial class BlazorChartRenderer
         if (skip != BlazorChartBorderSkipped.Right) Edge(x2, y1, x2, y2);
         if (skip != BlazorChartBorderSkipped.Bottom) Edge(x2, y2, x1, y2);
         if (skip != BlazorChartBorderSkipped.Left) Edge(x1, y2, x1, y1);
+        return sb.ToString().Trim();
+    }
+
+    /// <summary>
+    /// Builds a border path for a rounded bar that follows the corner radii, omitting the skipped edge.
+    /// The outline is traced clockwise; the skipped straight edge is dropped so the stroke matches the
+    /// rounded fill exactly (instead of cutting square corners).
+    /// </summary>
+    private static string RoundedBarBorderPath(double x, double y, double w, double h,
+        BlazorChartBorderRadiusCorners c, BlazorChartBorderSkipped skip)
+    {
+        double max = Math.Min(w, h) / 2;
+        double tl = Math.Clamp(c.TopLeft, 0, max);
+        double tr = Math.Clamp(c.TopRight, 0, max);
+        double br = Math.Clamp(c.BottomRight, 0, max);
+        double bl = Math.Clamp(c.BottomLeft, 0, max);
+
+        // Vertices around the rounded rectangle, clockwise starting at the end of the top-left corner.
+        var pts = new (double X, double Y)[]
+        {
+            (x + tl, y),         // P0  start of top edge
+            (x + w - tr, y),     // P1  end of top edge
+            (x + w, y + tr),     // P2  end of top-right corner
+            (x + w, y + h - br), // P3  end of right edge
+            (x + w - br, y + h), // P4  end of bottom-right corner
+            (x + bl, y + h),     // P5  end of bottom edge
+            (x, y + h - bl),     // P6  end of bottom-left corner
+            (x, y + tl),         // P7  end of left edge
+        };
+        // Segment i draws from pts[i] to pts[(i+1)%8]. Odd segments are corner arcs.
+        double[] arcR = { 0, tr, 0, br, 0, bl, 0, tl };
+        bool[] isArc = { false, true, false, true, false, true, false, true };
+
+        int skipSeg = skip switch
+        {
+            BlazorChartBorderSkipped.Top => 0,
+            BlazorChartBorderSkipped.Right => 2,
+            BlazorChartBorderSkipped.Bottom => 4,
+            BlazorChartBorderSkipped.Left => 6,
+            _ => -1
+        };
+
+        string Cmd(int seg)
+        {
+            var end = pts[(seg + 1) % 8];
+            return isArc[seg] && arcR[seg] > 0
+                ? $"A {BlazorChartSvg.N(arcR[seg])} {BlazorChartSvg.N(arcR[seg])} 0 0 1 {BlazorChartSvg.N(end.X)} {BlazorChartSvg.N(end.Y)} "
+                : $"L {BlazorChartSvg.N(end.X)} {BlazorChartSvg.N(end.Y)} ";
+        }
+
+        var sb = new StringBuilder();
+        if (skipSeg < 0)
+        {
+            // No skipped edge: closed rounded outline.
+            sb.Append($"M {BlazorChartSvg.N(pts[0].X)} {BlazorChartSvg.N(pts[0].Y)} ");
+            for (int i = 0; i < 8; i++) sb.Append(Cmd(i));
+            sb.Append('Z');
+            return sb.ToString().Trim();
+        }
+
+        // Open path: start just after the skipped edge and walk the remaining seven segments.
+        int start = (skipSeg + 1) % 8;
+        sb.Append($"M {BlazorChartSvg.N(pts[start].X)} {BlazorChartSvg.N(pts[start].Y)} ");
+        for (int k = 0; k < 7; k++) sb.Append(Cmd((start + k) % 8));
         return sb.ToString().Trim();
     }
 

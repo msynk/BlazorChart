@@ -32,7 +32,7 @@
     <div class="card">
         <h3>Rounded + per-bar colors</h3>
         <p class="desc">borderRadius, palette per index</p>
-        <BlazorChart Type="BlazorChartType.Bar" Data="@PerColor()" Options="@_rounded" />
+        <BlazorChart Type="BlazorChartType.Bar" Data="@PerColorRounded()" Options="@_rounded" />
         <CodeBlock Code="@RoundedSnippet" />
     </div>
 
@@ -147,7 +147,7 @@
         """;
 
     private const string RoundedSnippet = """
-        <BlazorChart Type="BlazorChartType.Bar" Data="PerColor()" Options="_rounded" />
+        <BlazorChart Type="BlazorChartType.Bar" Data="PerColorRounded()" Options="_rounded" />
 
         @code {
             private readonly BlazorChartOptions _rounded = new()
@@ -155,7 +155,7 @@
                 Plugins = new BlazorChartPluginOptions { Legend = new BlazorChartLegendOptions { Display = false } }
             };
 
-            private BlazorChartData PerColor() => new()
+            private BlazorChartData PerColorRounded() => new()
             {
                 Labels = { "Red", "Blue", "Teal", "Orange", "Purple" },
                 Datasets =
@@ -165,7 +165,7 @@
                         Label = "Votes",
                         Data = new() { 12, 19, 7, 15, 9 },
                         BackgroundColors = new() { "#ff6384", "#36a2eb", "#4bc0c0", "#ff9f40", "#9966ff" },
-                        BorderRadius = 6
+                        BorderRadius = 16
                     }
                 }
             };
@@ -397,6 +397,21 @@
                 Data = SampleData.V(12, 19, 7, 15, 9),
                 BackgroundColors = new() { "#ff6384", "#36a2eb", "#4bc0c0", "#ff9f40", "#9966ff" },
                 BorderRadius = 6
+            }
+        }
+    };
+
+    private BlazorChartData PerColorRounded() => new()
+    {
+        Labels = { "Red", "Blue", "Teal", "Orange", "Purple" },
+        Datasets =
+        {
+            new BlazorChartDataset
+            {
+                Label = "Votes",
+                Data = SampleData.V(12, 19, 7, 15, 9),
+                BackgroundColors = new() { "#ff6384", "#36a2eb", "#4bc0c0", "#ff9f40", "#9966ff" },
+                BorderRadius = 16
             }
         }
     };
